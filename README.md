@@ -57,7 +57,7 @@ The course is organized into four comprehensive modules:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/mysql-query-master.git
+   git clone https://github.com/Om-Gajjar/mysql-query-master.git
    ```
 
 2. Navigate to the project directory:
