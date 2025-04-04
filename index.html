@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master MySQL Queries</title>
+
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!-- Prism.js CSS (Okaidia Theme) CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css"
+        rel="stylesheet" />
+
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+    <header class="site-header text-white text-center py-5 mb-4">
+        <div class="container">
+            <h1 class="display-3">Master MySQL Queries</h1>
+            <p class="lead">Your journey to becoming a database expert starts here.</p>
+        </div>
+    </header>
+
+    <!-- Add sidebar toggle button for all screen sizes -->
+    <button id="sidebar-toggle" class="btn btn-primary position-fixed">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <!-- Add backdrop div -->
+    <div class="sidebar-backdrop"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Navigation - removed Bootstrap column classes -->
+            <nav id="sidebar-nav" class="sidebar">
+                <div class="position-sticky pt-3">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <h6
+                                class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                                <span>Module 1: Querying Data</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-1-1.html">
+                                <i class="bi bi-filetype-sql me-2"></i> 1.1 Introduction to SELECT
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-1-2.html">
+                                <i class="bi bi-filter me-2"></i> 1.2 Filtering with WHERE
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-1-3.html">
+                                <i class="bi bi-sort-alpha-down me-2"></i> 1.3 Sorting with ORDER BY
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-1-4.html">
+                                <i class="bi bi-chevron-bar-contract me-2"></i> 1.4 Limiting Results with LIMIT
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <h6
+                                class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                                <span>Module 2: Manipulating Data</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-2-1.html">
+                                <i class="bi bi-plus-square me-2"></i> 2.1 Inserting Data (INSERT)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-2-2.html">
+                                <i class="bi bi-pencil-square me-2"></i> 2.2 Updating Data (UPDATE)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-2-3.html">
+                                <i class="bi bi-trash me-2"></i> 2.3 Deleting Data (DELETE)
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <h6
+                                class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                                <span>Module 3: Joining Tables</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-3-1.html">
+                                <i class="bi bi-intersect me-2"></i> 3.1 Combining Tables (INNER JOIN)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link disabled" href="#">
+                                <i class="bi bi-diagram-2 me-2"></i> 3.2 Other Join Types (Soon!)
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <h6
+                                class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                                <span>Module 4: Aggregation</span>
+                            </h6>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-4-1.html">
+                                <i class="bi bi-calculator me-2"></i> 4.1 Aggregate Functions (COUNT, AVG)
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-lesson-url="lessons/lesson-4-2.html">
+                                <i class="bi bi-collection me-2"></i> 4.2 Grouping Results (GROUP BY)
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content Area - now takes full width -->
+            <main id="content-area" class="col-12 px-md-4 py-3">
+                <h2>Welcome!</h2>
+                <p>Select a lesson from the sidebar to begin learning about MySQL queries.</p>
+                <p>This website provides interactive examples and a sandbox environment to practice your skills directly
+                    in the browser.</p>
+                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+                    alt="Database technology concept" class="img-fluid rounded mt-3"
+                    style="max-height: 400px; object-fit: cover; width: 100%;">
+
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-dark text-white text-center">
+        <div class="container">
+            <span>&copy;
+                <script>document.write(new Date().getFullYear())</script> MySQL Query Master. All Rights Reserved.
+            </span>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+    <!-- Prism.js Core & SQL Language CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+
+
+    <!-- sql.js CDN -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js'></script>
+
+
+    <!-- Custom JS -->
+    <script src="js/sandbox.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>

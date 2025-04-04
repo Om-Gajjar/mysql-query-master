@@ -1,0 +1,88 @@
+<h1 class="mb-4">4.2 Grouping Results (GROUP BY)</h1>
+
+<p>The <code>GROUP BY</code> statement groups rows that have the same values in one or more columns into a summary row. It is often used with aggregate functions (<code>COUNT</code>, <code>MAX</code>, <code>MIN</code>, <code>SUM</code>, <code>AVG</code>) to perform calculations on each group.</p>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+SELECT column_name(s), AGGREGATE_FUNCTION(column_name)
+FROM table_name
+WHERE condition -- Optional
+GROUP BY column_name(s)
+ORDER BY column_name(s); -- Optional
+</code></pre>
+
+<ul>
+    <li>The columns listed in the <code>SELECT</code> statement must either be aggregate functions or be included in the <code>GROUP BY</code> clause.</li>
+    <li>The query first filters rows based on the <code>WHERE</code> clause (if present).</li>
+    <li>Then, it groups the remaining rows based on the unique combinations of values in the `GROUP BY` columns.</li>
+    <li>Finally, the aggregate functions are applied to each group.</li>
+</ul>
+
+<p>Example: Count the number of users in each department.</p>
+<pre><code class="language-sql line-numbers">
+SELECT department_id, COUNT(*) AS number_of_users
+FROM users
+WHERE department_id IS NOT NULL -- Only count users with a department
+GROUP BY department_id
+ORDER BY number_of_users DESC; -- Show busiest departments first
+</code></pre>
+
+<p>To make this more readable, we can join with the `departments` table to get the department names:</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    d.department_name,
+    COUNT(u.id) AS number_of_users -- Count user IDs within each group
+FROM users AS u
+INNER JOIN departments AS d ON u.department_id = d.department_id
+GROUP BY d.department_name -- Group by the name now
+ORDER BY number_of_users DESC;
+</code></pre>
+
+<p>Another Example: Find the most recent signup date within each department.</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    d.department_name,
+    MAX(u.signup_date) AS latest_signup
+FROM users AS u
+INNER JOIN departments AS d ON u.department_id = d.department_id
+GROUP BY d.department_name
+ORDER BY latest_signup DESC;
+</code></pre>
+
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try counting the number of users per department using a JOIN.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="10">-- Count users per department name
+SELECT
+    d.department_name,
+    COUNT(u.id) AS user_count
+FROM departments AS d -- Start from departments
+LEFT JOIN users AS u ON d.department_id = u.department_id -- Use LEFT JOIN to include departments with 0 users
+GROUP BY d.department_name
+ORDER BY user_count DESC;
+
+-- Note: LEFT JOIN includes all departments, even if no users match.
+-- INNER JOIN would only show departments with at least one user.
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+            <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+            <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

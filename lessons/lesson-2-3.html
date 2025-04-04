@@ -1,0 +1,63 @@
+<h1 class="mb-4">2.3 Deleting Data (DELETE FROM)</h1>
+
+<p>The <code>DELETE FROM</code> statement is used to remove existing rows from a table.</p>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+DELETE FROM table_name
+WHERE condition; -- EXTREMELY IMPORTANT!
+</code></pre>
+
+<p><strong>WARNING:</strong> Just like <code>UPDATE</code>, the <code>WHERE</code> clause is critical. If you omit the <code>WHERE</code> clause, <strong>all rows</strong> in the table will be deleted!</p>
+
+<p>The <code>WHERE</code> clause specifies which row(s) should be deleted, using the same conditions as <code>SELECT</code> and <code>UPDATE</code>.</p>
+
+<p>Example: Delete the user with the email 'charlie@example.com':</p>
+<pre><code class="language-sql line-numbers">
+DELETE FROM users
+WHERE email = 'charlie@example.com';
+</code></pre>
+
+<p>Example: Delete all users who signed up before 2024:</p>
+<pre><code class="language-sql line-numbers">
+DELETE FROM users
+WHERE signup_date < '2024-01-01';
+</code></pre>
+
+<p>There is no way to undo a <code>DELETE</code> operation with standard SQL once it's committed (though database backups are used in real-world scenarios). Be very careful!</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try deleting the user named 'Ethan Hunt'. Then run <code>SELECT * FROM users;</code> to verify.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="8">-- Delete a specific user
+DELETE FROM users
+WHERE name = 'Ethan Hunt';
+
+-- Verify the deletion
+SELECT * FROM users;
+
+
+-- EXTREME CAUTION! This would delete ALL users!
+-- DELETE FROM users;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+            <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+            <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

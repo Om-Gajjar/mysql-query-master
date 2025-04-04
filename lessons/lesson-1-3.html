@@ -1,0 +1,65 @@
+<h1 class="mb-4">1.3 Sorting Results with ORDER BY</h1>
+
+<p>By default, the order of rows returned by a <code>SELECT</code> query is not guaranteed. To sort the results based on one or more columns, use the <code>ORDER BY</code> clause.</p>
+
+<p>The syntax is:</p>
+<pre><code class="language-sql line-numbers">
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition  -- Optional
+ORDER BY column_to_sort_by [ASC | DESC], another_column [ASC | DESC], ...;
+</code></pre>
+
+<ul>
+    <li><code>ASC</code> (Ascending) is the default sorting order (A-Z, smallest to largest). You can omit it.</li>
+    <li><code>DESC</code> (Descending) sorts in reverse order (Z-A, largest to smallest).</li>
+</ul>
+
+<p>You can sort by multiple columns. The sorting is applied sequentially based on the order you list the columns.</p>
+
+<p>Example: Get all users, sorted alphabetically by name:</p>
+<pre><code class="language-sql line-numbers">
+SELECT name, email, signup_date
+FROM users
+ORDER BY name ASC; -- ASC is optional here
+</code></pre>
+
+<p>Example: Get all users, sorted by signup date (most recent first), and then by name alphabetically for users who signed up on the same date:</p>
+<pre><code class="language-sql line-numbers">
+SELECT name, signup_date
+FROM users
+ORDER BY signup_date DESC, name ASC;
+</code></pre>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try getting all users sorted by their signup date, oldest first.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="6">-- Get users sorted by signup_date (oldest first)
+SELECT name, signup_date
+FROM users
+ORDER BY signup_date;
+
+-- Try sorting by name in descending order
+-- SELECT name, email FROM users ORDER BY name DESC;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+<h1 class="mb-4">1.2 Filtering Data with WHERE</h1>
+
+<p>Often, you don't want to retrieve *all* rows from a table. The <code>WHERE</code> clause allows you to specify conditions to filter the rows returned by your <code>SELECT</code> statement.</p>
+
+<p>The basic syntax is:</p>
+<pre><code class="language-sql line-numbers">
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;
+</code></pre>
+
+<p>The <code>condition</code> typically involves comparing a column's value using operators like:</p>
+<ul>
+    <li><code>=</code> (Equal to)</li>
+    <li><code>!=</code> or <code>&lt;&gt;</code> (Not equal to)</li>
+    <li><code>&gt;</code> (Greater than)</li>
+    <li><code>&lt;</code> (Less than)</li>
+    <li><code>&gt;=</code> (Greater than or equal to)</li>
+    <li><code>&lt;=</code> (Less than or equal to)</li>
+    <li><code>LIKE</code> (Pattern matching - often used with <code>%</code> wildcard)</li>
+    <li><code>IN</code> (Checks if a value is within a list)</li>
+    <li><code>BETWEEN</code> (Checks if a value is within a range)</li>
+    <li><code>IS NULL</code> (Checks if a value is NULL)</li>
+    <li><code>IS NOT NULL</code> (Checks if a value is not NULL)</li>
+</ul>
+
+<p>You can combine multiple conditions using <code>AND</code> (both conditions must be true) and <code>OR</code> (at least one condition must be true).</p>
+
+<p>For example, to find the user named 'Alice Wonderland':</p>
+<pre><code class="language-sql line-numbers">
+SELECT id, name, email
+FROM users
+WHERE name = 'Alice Wonderland';
+</code></pre>
+
+<p>To find all users who signed up before 2024:</p>
+<pre><code class="language-sql line-numbers">
+SELECT name, signup_date
+FROM users
+WHERE signup_date < '2024-01-01';
+</code></pre>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try finding users from the 'Engineering' department (department_id = 2).</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="6">-- Find users in the Engineering department (id=2)
+SELECT name, email, department_id
+FROM users
+WHERE department_id = 2;
+
+-- Try finding users whose name starts with 'B'
+-- SELECT name FROM users WHERE name LIKE 'B%';
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

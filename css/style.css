@@ -1,0 +1,520 @@
+/* --- Google Fonts Import --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&family=Source+Code+Pro:wght@400;500&display=swap');
+
+/* --- CSS Variables (Theme) --- */
+:root {
+    --primary-color: #0d6efd; /* Bootstrap Blue (can be changed, e.g., #00796b Teal) */
+    --primary-color-rgb: 13, 110, 253;
+    --secondary-color: #6c757d; /* Bootstrap Secondary */
+    --light-bg: #f8f9fa; /* Light Gray */
+    --lighter-bg: #f0f2f5; /* Main background */
+    --dark-bg: #343a40; /* Dark Gray */
+    --text-color: #212529; /* Default Text */
+    --text-muted: #6c757d;
+    --border-color: #dee2e6;
+    --code-bg: #2d2d2d; /* Okaidia theme background */
+    --code-text: #f8f8f2; /* Okaidia theme text */
+    --success-color: #198754;
+    --success-color-rgb: 25, 135, 84;
+    --error-color: #dc3545;
+    --error-color-rgb: 220, 53, 69;
+    --running-color: #0dcaf0; /* Info Blue */
+    --running-color-rgb: 13, 202, 240;
+
+    --body-font: 'Source Sans Pro', sans-serif;
+    --heading-font: 'Poppins', sans-serif;
+    --code-font: 'Source Code Pro', monospace;
+
+    --border-radius: 0.375rem; /* Bootstrap's default */
+    --box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
+    --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+}
+
+/* --- Base & Typography --- */
+body {
+    font-family: var(--body-font);
+    color: var(--text-color);
+    background-color: var(--lighter-bg); /* Use the lighter background */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    line-height: 1.7; /* Improve paragraph readability */
+    font-size: 16px; /* Base font size */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--heading-font);
+    font-weight: 600;
+    color: var(--dark-bg);
+    margin-bottom: 1rem;
+    line-height: 1.3; /* Tighter line height for headings */
+}
+h1 { font-size: 2.2rem; } /* Main Lesson Title */
+h2 { /* Sub-section Titles */
+    font-size: 1.8rem;
+    margin-top: 3rem; /* More space above H2 */
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border-color); /* Lighter border */
+    font-weight: 600;
+}
+h3 { /* Further Sub-sections */
+    font-size: 1.4rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: var(--primary-color); /* Use primary color for H3 */
+}
+p {
+    margin-bottom: 1.25rem; /* Slightly more space after paragraphs */
+    max-width: 75ch; /* Limit paragraph width for readability */
+}
+ul, ol {
+    padding-left: 2em; /* Standard indentation */
+    margin-bottom: 1.25rem;
+    max-width: 75ch;
+}
+ul li, ol li {
+     margin-bottom: 0.5rem; /* Space between list items */
+}
+/* Optional: Custom bullets for UL */
+ul {
+    list-style: none;
+    padding-left: 1.5em;
+}
+ul li::before {
+    content: "•"; /* Bullet character */
+    color: var(--primary-color);
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1.25em; /* Align with text */
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600; /* Make links slightly bolder */
+    transition: color 0.2s ease-in-out, background-color 0.2s ease;
+}
+a:hover {
+    color: darken(var(--primary-color), 10%);
+    text-decoration: none; /* Often preferred */
+     background-color: rgba(var(--primary-color-rgb), 0.05); /* Subtle hover background */
+     border-radius: 0.2rem;
+}
+
+/* --- Header --- */
+.site-header {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 4rem 1rem;
+    border-bottom: 4px solid var(--primary-color);
+    box-shadow: var(--box-shadow);
+    text-align: center; /* Ensure centered */
+}
+.site-header h1 {
+    font-weight: 700;
+    color: #fff;
+    font-size: 3rem;
+}
+.site-header .lead {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+
+/* --- Sidebar (Mobile Style for All Screens) --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: -320px; /* Start off-screen */
+    z-index: 1030;
+    width: min(320px, 85%); /* Either 320px or 85% of viewport, whichever is smaller */
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid var(--border-color);
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    transition: left 0.3s ease;
+    overflow-y: auto;
+}
+
+/* When sidebar is shown */
+.sidebar.show {
+    left: 0;
+}
+
+/* Backdrop for all screen sizes */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1020;
+    display: none;
+}
+
+.sidebar-backdrop.show {
+    display: block;
+}
+
+/* Make toggle button visible for all screen sizes */
+#sidebar-toggle {
+    display: block !important; /* Override Bootstrap's d-md-none */
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1040;
+}
+
+.sidebar .position-sticky {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.sidebar .sidebar-heading {
+    font-size: 0.75rem; /* Smaller heading */
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.05em; /* Add letter spacing */
+    color: var(--text-muted);
+    padding: 0.75rem 1.5rem; /* Adjust padding */
+    margin-top: 1.5rem; /* More space above headings */
+    margin-bottom: 0.5rem; /* Less space below */
+    border-top: 1px solid var(--border-color); /* Separator line */
+}
+.sidebar .sidebar-heading:first-of-type {
+     margin-top: 0; /* No top margin for the very first heading */
+     border-top: none;
+}
+
+.sidebar .nav-link {
+    font-weight: 500; /* Slightly bolder than default */
+    font-size: 0.9rem; /* Slightly smaller font */
+    color: #343a40; /* Darker text */
+    padding: 0.7rem 1rem 0.7rem 1.5rem; /* Adjust padding (more left) */
+    margin: 0.1rem 0.75rem; /* Adjust margin */
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    border-left: 4px solid transparent; /* Indicator area */
+    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-left-color 0.15s ease-in-out;
+    position: relative;
+    overflow: hidden; /* For potential future effects */
+}
+.sidebar .nav-link i.bi {
+    margin-right: 0.8rem;
+    font-size: 1rem; /* Adjust icon size */
+    color: var(--secondary-color);
+    transition: color 0.15s ease-in-out;
+    flex-shrink: 0; /* Prevent icon shrinking */
+}
+
+/* Sidebar Hover State */
+.sidebar .nav-link:hover {
+    background-color: var(--light-bg);
+    color: var(--primary-color);
+    border-left-color: var(--primary-color); /* Show border on hover */
+    text-decoration: none;
+}
+.sidebar .nav-link:hover i.bi {
+    color: var(--primary-color);
+}
+
+/* Sidebar Active State */
+.sidebar .nav-link.active {
+    background-color: rgba(var(--primary-color-rgb), 0.08); /* Subtle primary background */
+    color: var(--primary-color);
+    font-weight: 700; /* Bold active link */
+    border-left-color: var(--primary-color); /* Strong border */
+}
+.sidebar .nav-link.active i.bi {
+    color: var(--primary-color);
+}
+
+/* Sidebar Disabled State */
+.sidebar .nav-link.disabled {
+    color: #adb5bd;
+    pointer-events: none;
+    background-color: transparent;
+    border-left-color: transparent;
+}
+.sidebar .nav-link.disabled i.bi {
+    color: #adb5bd;
+}
+
+
+/* --- Main Content Area --- */
+#content-area {
+    padding: 2.5rem 3rem 2.5rem 3.5rem; /* Increased left padding to account for toggle button */
+    background-color: #ffffff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-sm);
+    margin-bottom: 3rem;
+    max-width: 100%; /* Allow full width */
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow: hidden;
+}
+
+/* Style elements within the content area */
+#content-area > *:last-child {
+    margin-bottom: 0; /* Remove bottom margin from last element */
+}
+
+#content-area img.img-fluid { /* Style the welcome image */
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow-sm);
+}
+
+
+/* --- Code Blocks (Prism.js) --- */
+pre[class*="language-"], code[class*="language-"] {
+    font-family: var(--code-font);
+    font-size: 0.9em;
+    line-height: 1.6; /* Slightly more line height in code */
+    hyphens: none;
+    tab-size: 4;
+}
+pre[class*="language-"] {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: var(--border-radius);
+    border: 1px solid #444;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
+    /* padding: 1.5em;
+    margin-top: 2rem; More space above code */
+    margin-bottom: 2rem; /* More space below code */
+    overflow: auto;
+    max-width: 100%; /* Ensure it doesn't overflow container */
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"],
+:not(pre) > code { /* Target general inline code too */
+    padding: .2em .5em; /* Slightly more padding */
+    border-radius: .25em;
+    background-color: rgba(var(--primary-color-rgb), 0.08); /* Subtle primary background */
+    color: var(--primary-color); /* Primary color text */
+    font-size: 0.875em; /* Adjust size */
+    font-family: var(--code-font);
+    font-weight: 500;
+    word-break: break-word; /* Prevent long inline code breaking layout */
+}
+
+/* Prism Line Numbers Refinement */
+pre.line-numbers {
+	position: relative;
+	padding-left: 3.8em;
+	counter-reset: linenumber;
+}
+pre[class*=language-].line-numbers>code {
+    position: static;
+}
+.line-numbers .line-numbers-rows {
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	font-size: 100%;
+	left: 0; /* Align to left */
+	width: 3.8em; /* Match padding-left */
+	letter-spacing: -1px;
+	border-right: 1px solid #555; /* Darker border for dark theme */
+	user-select: none;
+    padding-top: 1.5em; /* Match pre padding */
+    padding-bottom: 1.5em; /* Match pre padding */
+    background: var(--code-bg); /* Match pre background */
+    /* Ensure line numbers have consistent background when scrolling */
+    height: 100%;
+}
+.line-numbers-rows > span {
+	display: block;
+	counter-increment: linenumber;
+}
+.line-numbers-rows > span:before {
+	content: counter(linenumber);
+	color: #888; /* Lighter gray for line numbers */
+	display: block;
+	padding-right: 0.8em;
+	text-align: right;
+}
+
+
+/* --- SQL Sandbox Styling --- */
+.sql-sandbox.card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    margin-top: 3rem; /* Ensure good separation */
+    margin-bottom: 2rem;
+    box-shadow: var(--box-shadow-sm);
+    overflow: hidden; /* Contain children */
+    max-width: 100%; /* Don't exceed content area width */
+}
+.sql-sandbox .card-header {
+    background-color: var(--light-bg);
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+    padding: 1rem 1.5rem; /* Adjust padding */
+    font-family: var(--heading-font);
+}
+.sql-sandbox .card-header i.bi {
+    color: var(--primary-color);
+    margin-right: 0.5rem;
+}
+.sql-sandbox .card-body {
+    padding: 1.5rem;
+}
+.sql-sandbox .card-text { /* Style the intro text */
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+}
+.sql-sandbox label.form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+#sql-input {
+    font-family: var(--code-font);
+    font-size: 0.95em;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: #fff; /* White input background */
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    resize: vertical; /* Allow vertical resize */
+    min-height: 100px;
+}
+#sql-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25); /* Use RGB version for transparency */
+}
+/* Buttons */
+.sql-sandbox .btn {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+    display: inline-flex; /* Align icon and text */
+    align-items: center;
+}
+.sql-sandbox .btn i.bi {
+    margin-right: 0.4rem; /* Space between icon and text */
+    font-size: 1.1em;
+}
+.sql-sandbox .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+.sql-sandbox .btn-primary:hover {
+     filter: brightness(90%);
+     border-color: darken(var(--primary-color), 10%);
+}
+
+/* Query Status */
+#query-status {
+    font-size: 0.90em; /* Slightly smaller */
+    padding: 0.3rem 0.8rem; /* Adjust padding */
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease-in-out;
+    min-width: 90px; /* Prevent jumping */
+    text-align: center;
+    font-weight: 600;
+    display: inline-flex; /* For icon alignment */
+    align-items: center;
+}
+#query-status i.bi {
+    margin-right: 0.4rem;
+    font-size: 1.1em;
+    line-height: 1;
+}
+#query-status.status-success {
+    color: var(--success-color);
+    background-color: rgba(var(--success-color-rgb), 0.1); /* Use RGB */
+    font-weight: 600;
+}
+#query-status.status-error {
+    color: var(--error-color);
+    background-color: rgba(var(--error-color-rgb), 0.1);
+    font-weight: 600;
+}
+#query-status.status-running {
+    color: var(--running-color);
+    background-color: rgba(var(--running-color-rgb), 0.1);
+    font-weight: 600;
+}
+/* Add icons to status (requires JS update) */
+/* #query-status.status-success::before { content: "\F28A "; font-family: 'Bootstrap-icons'; } */ /* checkmark-circle-fill */
+/* #query-status.status-error::before { content: "\F62A "; font-family: 'Bootstrap-icons'; } */ /* x-octagon-fill */
+/* #query-status.status-running::before { content: "\F6B3 "; font-family: 'Bootstrap-icons'; } */ /* hourglass-split */
+
+
+/* Query Output */
+#query-output {
+    min-height: 120px;
+    background-color: var(--light-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1rem 1.25rem; /* Adjust padding */
+    font-family: var(--code-font);
+    font-size: 0.875em; /* Slightly smaller output font */
+    color: #333;
+    white-space: pre; /* Use pre for better table formatting */
+    word-wrap: normal; /* Prevent wrapping with pre */
+    overflow-x: auto; /* Allow horizontal scroll */
+    transition: background-color 0.3s ease;
+}
+#query-output.error {
+    background-color: rgba(var(--error-color-rgb), 0.08); /* Lighter red bg */
+    color: var(--error-color);
+    border-color: rgba(var(--error-color-rgb), 0.3);
+    font-weight: 500;
+    white-space: pre-wrap; /* Allow wrapping for errors */
+    word-wrap: break-word;
+}
+
+
+/* --- Footer --- */
+.footer {
+    background-color: var(--dark-bg);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 1.5rem 0;
+    margin-top: auto; /* Push to bottom */
+    font-size: 0.9rem;
+    text-align: center;
+}
+.footer a {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400; /* Normal weight in footer */
+}
+.footer a:hover {
+    color: #fff;
+    background-color: transparent; /* No bg hover in footer */
+}
+
+/* --- Responsive Adjustments --- */
+@media (max-width: 991.98px) { /* Adjust breakpoint if needed */
+     #content-area {
+         padding: 2rem 1.5rem 2rem 3rem; /* Adjust padding, keeping left padding for button */
+     }
+}
+@media (max-width: 767.98px) {
+    #content-area {
+        padding: 1.5rem 1rem 1.5rem 2.5rem; /* Less padding on small screens, but keep space for button */
+    }
+     .site-header {
+         padding: 3rem 1rem;
+     }
+     .site-header h1 { font-size: 2.5rem; }
+     h1 { font-size: 1.8rem; } /* Reduce heading sizes */
+     h2 { font-size: 1.5rem; }
+     h3 { font-size: 1.2rem; }
+     p, ul, ol { max-width: none; } /* Remove text width limit */
+}

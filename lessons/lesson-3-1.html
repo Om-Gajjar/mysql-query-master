@@ -1,0 +1,77 @@
+<h1 class="mb-4">3.1 Combining Tables (INNER JOIN)</h1>
+
+<p>Real-world data is often split across multiple related tables (like our `users` and `departments` tables). <code>JOIN</code> clauses are used to combine rows from two or more tables based on a related column between them.</p>
+
+<p>The <code>INNER JOIN</code> keyword selects records that have matching values in both tables.</p>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+SELECT table1.column1, table2.column2, ...
+FROM table1
+INNER JOIN table2
+ON table1.related_column = table2.related_column;
+WHERE condition; -- Optional filtering on the combined result
+</code></pre>
+
+<ul>
+    <li>Specify the columns you want using `table_name.column_name` notation to avoid ambiguity if columns have the same name in different tables (like `id`).</li>
+    <li><code>FROM table1</code> specifies the "left" table.</li>
+    <li><code>INNER JOIN table2</code> specifies the "right" table you want to join with.</li>
+    <li><code>ON table1.related_column = table2.related_column</code> defines the join condition – how the tables are related. This is typically done using primary key and foreign key columns.</li>
+</ul>
+
+<p>Example: Get the name of each user and the name of their department.</p>
+<p>In our case, `users.department_id` is the foreign key that relates to `departments.department_id` (the primary key of the departments table).</p>
+<pre><code class="language-sql line-numbers">
+SELECT users.name, users.email, departments.department_name
+FROM users
+INNER JOIN departments
+ON users.department_id = departments.department_id;
+</code></pre>
+<p>Note: This query will only include users who *have* a department assigned (where `department_id` is not NULL and matches an ID in the `departments` table). Users with `department_id = NULL` (like Ethan Hunt initially) will not appear in the results of an `INNER JOIN`.</p>
+
+<p>You can use table aliases to make the query shorter:</p>
+<pre><code class="language-sql line-numbers">
+SELECT u.name, u.email, d.department_name
+FROM users AS u -- Alias 'u' for users
+INNER JOIN departments AS d -- Alias 'd' for departments
+ON u.department_id = d.department_id
+WHERE d.department_name = 'Engineering'; -- Further filtering
+</code></pre>
+
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try the query below to list users alongside their department names.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="8">-- Get user names and their department names
+SELECT
+    u.name AS UserName, -- Using aliases for output columns
+    d.department_name AS Department
+FROM
+    users AS u
+INNER JOIN
+    departments AS d ON u.department_id = d.department_id
+ORDER BY
+    Department, UserName; -- Sort the results
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+            <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+            <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

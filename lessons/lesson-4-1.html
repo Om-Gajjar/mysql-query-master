@@ -1,0 +1,79 @@
+<h1 class="mb-4">4.1 Aggregate Functions (COUNT, AVG, SUM, MIN, MAX)</h1>
+
+<p>Aggregate functions perform a calculation on a set of rows and return a single summary value.</p>
+
+<p>Common aggregate functions include:</p>
+<ul>
+    <li><code>COUNT(column_or_*)</code>: Counts the number of rows. <code>COUNT(*)</code> counts all rows; <code>COUNT(column_name)</code> counts rows where that column is not NULL.</li>
+    <li><code>SUM(column)</code>: Calculates the sum of values in a numeric column.</li>
+    <li><code>AVG(column)</code>: Calculates the average of values in a numeric column.</li>
+    <li><code>MIN(column)</code>: Finds the minimum value in a column.</li>
+    <li><code>MAX(column)</code>: Finds the maximum value in a column.</li>
+</ul>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+SELECT AGGREGATE_FUNCTION(column_name)
+FROM table_name
+WHERE condition; -- Optional: aggregate over a subset of rows
+</code></pre>
+
+<p>Example: Count the total number of users:</p>
+<pre><code class="language-sql line-numbers">
+SELECT COUNT(*) AS total_users
+FROM users;
+</code></pre>
+
+<p>Example: Count the number of users who have an assigned department:</p>
+<pre><code class="language-sql line-numbers">
+SELECT COUNT(department_id) AS users_with_department
+FROM users;
+</code></pre>
+
+<p>Example: Find the earliest signup date:</p>
+<pre><code class="language-sql line-numbers">
+SELECT MIN(signup_date) AS earliest_signup
+FROM users;
+</code></pre>
+
+<p>You can use multiple aggregate functions in one query:</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    COUNT(*) AS total_users,
+    MIN(signup_date) AS first_signup,
+    MAX(signup_date) AS last_signup
+FROM users;
+</code></pre>
+<p>Note: Aggregate functions typically operate on the entire table or the subset defined by a `WHERE` clause, unless used with `GROUP BY` (covered next).</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try counting how many departments there are.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="6">-- Count the number of departments
+SELECT COUNT(*) AS number_of_departments
+FROM departments;
+
+-- Count users in the Engineering department (ID 2)
+-- SELECT COUNT(*) FROM users WHERE department_id = 2;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+            <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+            <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+            <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>
