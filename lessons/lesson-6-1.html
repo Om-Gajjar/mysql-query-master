@@ -1,0 +1,82 @@
+<h1 class="mb-4">6.1 The Opposite View: RIGHT JOIN</h1>
+
+<p>The <code>RIGHT JOIN</code> (or <code>RIGHT OUTER JOIN</code>) is the mirror image of the <code>LEFT JOIN</code>. It returns all rows from the <strong>right table</strong> (the one listed after <code>RIGHT JOIN</code>) and the matched rows from the <strong>left table</strong> (the one listed after <code>FROM</code>).</p>
+<p>If there is no match in the left table for a row from the right table, the result will contain <code>NULL</code> values for all columns selected from the left table.</p>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+SELECT table1.column1, table2.column2, ...
+FROM table1 -- Left table
+RIGHT JOIN table2 -- Right table
+ON table1.related_column = table2.related_column;
+WHERE condition; -- Optional
+</code></pre>
+
+<p>Example: List *all* departments and any users within them. Departments with no users will still be listed, but their user information (name, email) will be <code>NULL</code>.</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    d.department_name,
+    u.name -- This will be NULL if the department has no matching user
+FROM
+    users AS u -- users is the LEFT table
+RIGHT JOIN
+    departments AS d ON u.department_id = d.department_id -- departments is the RIGHT table
+ORDER BY
+    d.department_name, u.name;
+</code></pre>
+
+<p><strong>Note on Usage:</strong> While <code>RIGHT JOIN</code> is functionally valid, many developers prefer to consistently use <code>LEFT JOIN</code> by simply switching the order of the tables in the <code>FROM</code> and <code>JOIN</code> clauses. The query above produces the exact same result as:</p>
+<pre><code class="language-sql line-numbers">
+-- Equivalent using LEFT JOIN
+SELECT
+    d.department_name,
+    u.name
+FROM
+    departments AS d -- departments is now the LEFT table
+LEFT JOIN
+    users AS u ON d.department_id = u.department_id -- users is now the RIGHT table
+ORDER BY
+    d.department_name, u.name;
+</code></pre>
+<p>Using <code>LEFT JOIN</code> predominantly can often make complex queries easier to read and maintain as the "main" table is always the one listed first in the <code>FROM</code> clause.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try listing all departments using RIGHT JOIN. Note that it's equivalent to using LEFT JOIN with tables swapped.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="10">-- List all departments and associated users using RIGHT JOIN
+SELECT
+    d.department_name,
+    u.name AS UserName
+FROM
+    users AS u
+RIGHT JOIN
+    departments AS d ON u.department_id = d.department_id
+ORDER BY
+    d.department_name, UserName;
+
+-- Compare with the equivalent LEFT JOIN:
+-- SELECT d.department_name, u.name AS UserName
+-- FROM departments d LEFT JOIN users u ON d.department_id = u.department_id
+-- ORDER BY d.department_name, UserName;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

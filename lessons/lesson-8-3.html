@@ -1,0 +1,92 @@
+<h1 class="mb-4">8.3 Automatic IDs: Sequences & Auto-Increment</h1>
+
+<p>Generating unique primary key values manually can be tedious and error-prone. Most database systems provide mechanisms to automatically generate sequential or unique values, typically used for primary key columns.</p>
+
+<h2 class="mt-5">Auto-Increment Columns</h2>
+<p>This is the most common approach seen in systems like MySQL, SQL Server, and SQLite.</p>
+<ul>
+    <li>You typically define an integer primary key column with a special keyword like <code>AUTO_INCREMENT</code> (MySQL), <code>IDENTITY</code> (SQL Server), or simply by declaring an <code>INTEGER PRIMARY KEY</code> (SQLite).</li>
+    <li>When you insert a new row without specifying a value for this column (or specifying <code>NULL</code>), the database automatically assigns the next available sequential integer value.</li>
+</ul>
+
+<p>SQLite Example (Implicit Auto-Increment):</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE logs (
+    log_id INTEGER PRIMARY KEY, -- In SQLite, this usually implies auto-increment
+    message TEXT,
+    timestamp TEXT DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Insert without specifying log_id
+INSERT INTO logs (message) VALUES ('System started.');
+INSERT INTO logs (message) VALUES ('User logged in.');
+
+-- The database assigns log_id values automatically (e.g., 1, 2, ...)
+SELECT * FROM logs;
+</code></pre>
+<p>SQLite maintains an internal sequence counter (`sqlite_sequence` table) for tables that use this feature explicitly with `AUTOINCREMENT` keyword (needed only to prevent reuse of IDs after deletes).</p>
+
+<h2 class="mt-5">Sequences (PostgreSQL, Oracle)</h2>
+<p>Some database systems (like PostgreSQL and Oracle) use a separate database object called a <strong>Sequence</strong>.</p>
+<ul>
+    <li>A sequence is an object that generates a series of unique numbers according to specified rules (start value, increment, min/max value, cycle, etc.).</li>
+    <li>You create a sequence independently: <code>CREATE SEQUENCE sequence_name;</code></li>
+    <li>You then typically use a function like <code>nextval('sequence_name')</code> to get the next value from the sequence, often setting it as the default value for a primary key column.</li>
+</ul>
+<pre><code class="language-sql line-numbers">
+-- PostgreSQL/Oracle style (Conceptual - Not directly runnable in SQLite sandbox)
+CREATE SEQUENCE user_id_seq START 1 INCREMENT 1;
+
+CREATE TABLE users_seq (
+    user_id INTEGER PRIMARY KEY DEFAULT nextval('user_id_seq'),
+    username TEXT NOT NULL
+);
+
+INSERT INTO users_seq (username) VALUES ('peter'); -- user_id gets next sequence value
+</code></pre>
+
+<p>Both mechanisms achieve the goal of automatically generating unique IDs, simplifying data insertion and ensuring primary key integrity.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">SQLite's `INTEGER PRIMARY KEY` usually acts as an auto-incrementing column. Observe how IDs are assigned automatically upon insertion.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="12">DROP TABLE IF EXISTS items;
+
+CREATE TABLE items (
+    item_id INTEGER PRIMARY KEY, -- Auto-generates IDs
+    item_name TEXT NOT NULL
+);
+
+-- Insert items without providing item_id
+INSERT INTO items (item_name) VALUES ('Apple');
+INSERT INTO items (item_name) VALUES ('Banana');
+INSERT INTO items (item_name) VALUES ('Cherry');
+
+-- The database assigns item_id 1, 2, 3 automatically
+SELECT * FROM items;
+
+-- You can see the internal sequence counter (if AUTOINCREMENT was explicit)
+-- SELECT * FROM sqlite_sequence WHERE name='items';
+-- (May be empty if AUTOINCREMENT keyword wasn't used)
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

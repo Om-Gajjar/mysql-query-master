@@ -1,0 +1,99 @@
+<h1 class="mb-4">9.4 Conditional Logic: CASE Expressions</h1>
+
+<p>Often, you need to implement conditional logic within your SQL query, similar to `if/then/else` statements in programming languages. The <code>CASE</code> expression allows you to do exactly this.</p>
+<p>It evaluates a list of conditions and returns one of multiple possible result expressions.</p>
+
+<p>There are two main forms:</p>
+
+<h2 class="mt-5">Simple CASE Expression</h2>
+<p>Compares an expression against a set of specific values.</p>
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+CASE input_expression
+    WHEN value1 THEN result1
+    WHEN value2 THEN result2
+    ...
+    [ELSE else_result]
+END
+</code></pre>
+<p>Example: Categorize departments based on their ID.</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    department_name,
+    CASE department_id
+        WHEN 1 THEN 'HR/People Ops'
+        WHEN 2 THEN 'Technology'
+        WHEN 3 THEN 'Marketing/Sales' -- Combine based on example data
+        WHEN 4 THEN 'Marketing/Sales'
+        ELSE 'Other/Uncategorized'
+    END AS DepartmentCategory
+FROM departments;
+</code></pre>
+
+<h2 class="mt-5">Searched CASE Expression</h2>
+<p>Evaluates a set of boolean conditions.</p>
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+CASE
+    WHEN condition1 THEN result1
+    WHEN condition2 THEN result2
+    ...
+    [ELSE else_result]
+END
+</code></pre>
+<p>The conditions are evaluated in order. The result corresponding to the *first* condition that evaluates to `TRUE` is returned. If no condition is true, the `ELSE` result is returned (or `NULL` if `ELSE` is omitted).</p>
+<p>Example: Label users based on their signup year.</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    name,
+    signup_date,
+    CASE
+        WHEN STRFTIME('%Y', signup_date) = '2024' THEN 'New User (2024)'
+        WHEN STRFTIME('%Y', signup_date) = '2023' THEN 'Signed up in 2023'
+        ELSE 'Veteran User (Pre-2023)'
+    END AS SignupEra
+FROM users;
+</code></pre>
+
+<p><code>CASE</code> expressions are extremely versatile and can be used in `SELECT` lists, `WHERE` clauses, `GROUP BY` clauses, and `ORDER BY` clauses to add powerful conditional logic to your queries.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Use a CASE expression to categorize users based on whether they have an assigned department.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="12">SELECT
+    name,
+    department_id,
+    CASE
+        WHEN department_id IS NULL THEN 'Unassigned'
+        WHEN department_id = 2 THEN 'Engineer' -- Assuming 2 is Engineering
+        ELSE 'Assigned (Other Dept)'
+    END AS AssignmentStatus
+FROM users
+ORDER BY AssignmentStatus, name;
+
+-- Try categorizing departments by name length
+-- SELECT department_name,
+--   CASE WHEN LENGTH(department_name) > 10 THEN 'Long Name' ELSE 'Short Name' END AS NameLengthCategory
+-- FROM departments;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

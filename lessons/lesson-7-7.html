@@ -1,0 +1,87 @@
+<h1 class="mb-4">7.7 Custom Rules: CHECK Constraint</h1>
+
+<p>The <code>CHECK</code> constraint allows you to specify a custom condition that must evaluate to `TRUE` (or `UNKNOWN`, which usually means involving a `NULL`) for any value being inserted or updated in a column.</p>
+<p>This provides a powerful way to enforce domain integrity and business rules directly within the database schema.</p>
+
+<p>The condition is a boolean expression similar to what you might use in a <code>WHERE</code> clause.</p>
+
+<p>Syntax (Column Level):</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE products (
+    product_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    price REAL CHECK (price > 0), -- Price must be positive
+    discount_percent INTEGER CHECK (discount_percent >= 0 AND discount_percent <= 100) -- Discount between 0-100
+);
+</code></pre>
+
+<p>Syntax (Table Level - can reference multiple columns):</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE time_log (
+    log_id INTEGER PRIMARY KEY,
+    start_time TEXT,
+    end_time TEXT,
+    -- Ensure end time is always after start time
+    CHECK (end_time > start_time)
+);
+</code></pre>
+
+<p>If an <code>INSERT</code> or <code>UPDATE</code> operation attempts to store a value that violates the <code>CHECK</code> constraint (i.e., the condition evaluates to `FALSE`), the database will reject the operation with an error.</p>
+
+<p>Example violation (based on the `products` table above):</p>
+<pre><code class="language-sql line-numbers">
+-- This would FAIL because price is not > 0
+INSERT INTO products (name, price) VALUES ('Freebie', 0);
+
+-- This would FAIL because discount is > 100
+UPDATE products SET discount_percent = 110 WHERE product_id = 1;
+</code></pre>
+
+<p>Support and complexity of expressions allowed in `CHECK` constraints can vary slightly between database systems.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">This table ensures `quantity` is non-negative and `status` is one of 'Pending', 'Shipped', 'Delivered'. Try violating these rules.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="16">DROP TABLE IF EXISTS orders_check;
+
+CREATE TABLE orders_check (
+    order_id INTEGER PRIMARY KEY,
+    product_name TEXT NOT NULL,
+    quantity INTEGER CHECK (quantity >= 0), -- Quantity cannot be negative
+    status TEXT DEFAULT 'Pending' CHECK (status IN ('Pending', 'Shipped', 'Delivered'))
+);
+
+-- Valid inserts
+INSERT INTO orders_check (product_name, quantity, status) VALUES ('Book', 5, 'Pending');
+INSERT INTO orders_check (product_name, quantity) VALUES ('Pen', 10); -- Uses default status
+
+-- Invalid insert (negative quantity)
+INSERT INTO orders_check (product_name, quantity) VALUES ('Paper', -1);
+
+-- Invalid insert (invalid status)
+INSERT INTO orders_check (product_name, quantity, status) VALUES ('Clips', 50, 'Cancelled');
+
+-- Check contents (only valid rows should be present)
+SELECT * FROM orders_check;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

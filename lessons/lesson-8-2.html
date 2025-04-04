@@ -1,0 +1,80 @@
+<h1 class="mb-4">8.2 Speeding Up Queries: Indexes</h1>
+
+<p>An <strong>Index</strong> is a special database object associated with a table or view that is used to speed up data retrieval operations. Think of it like an index in the back of a book: instead of scanning every page (every row) to find information, the database can use the index to quickly locate the relevant rows.</p>
+
+<p>Indexes work by creating a data structure (commonly a B-tree) that holds the values from the indexed column(s) and pointers to the actual table rows containing those values. This allows the database to efficiently find rows matching specific <code>WHERE</code> clause conditions or to quickly perform <code>JOIN</code> operations.</p>
+
+<p><strong>When to Use Indexes:</strong></p>
+<ul>
+    <li>Columns frequently used in <code>WHERE</code> clauses.</li>
+    <li>Columns used in <code>ORDER BY</code> clauses.</li>
+    <li>Columns used in <code>JOIN</code> conditions (primary and foreign keys are often automatically indexed).</li>
+</ul>
+
+<p><strong>Trade-offs:</strong> While indexes speed up `SELECT` queries, they can slow down data modification operations (`INSERT`, `UPDATE`, `DELETE`) because the index structure also needs to be updated. They also consume additional disk space.</p>
+
+<p>Syntax to create an index:</p>
+<pre><code class="language-sql line-numbers">
+-- Create an index on a single column
+CREATE INDEX index_name
+ON table_name (column_name);
+
+-- Create a unique index (ensures uniqueness like a UNIQUE constraint, but is an index)
+CREATE UNIQUE INDEX index_name
+ON table_name (column_name);
+
+-- Create a composite index (on multiple columns)
+CREATE INDEX index_name
+ON table_name (column1, column2, ...);
+</code></pre>
+
+<p>Example: Create an index on the `email` column of the `users` table to speed up lookups by email address.</p>
+<pre><code class="language-sql line-numbers">
+CREATE INDEX idx_users_email ON users (email);
+</code></pre>
+
+<p>Databases often automatically create indexes for `PRIMARY KEY` and sometimes `UNIQUE` constraints. You typically create additional indexes manually for other frequently queried columns.</p>
+<p>You don't explicitly "use" an index in your queries. The database query optimizer automatically decides whether using an available index will be faster than scanning the entire table for a given query.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">This example creates an index on the `name` column. While the performance difference isn't measurable in this small sandbox, it demonstrates the syntax.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="10">-- Drop index if it exists from previous run
+DROP INDEX IF EXISTS idx_users_name;
+
+-- Create an index on the user's name
+CREATE INDEX idx_users_name ON users (name);
+
+-- This query *might* use the index if the optimizer decides it's efficient
+--(performance gain is negligible on this small dataset)
+SELECT id, email, signup_date
+FROM users
+WHERE name = 'Alice Wonderland';
+
+-- You can usually see created indexes using database-specific commands
+-- (e.g., .indices users in SQLite CLI, or SHOW INDEX FROM users IN MySQL)
+-- This sandbox doesn't have a command to show indexes directly.
+SELECT name FROM sqlite_master WHERE type='index' AND tbl_name='users';
+
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

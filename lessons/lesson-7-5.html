@@ -1,0 +1,86 @@
+<h1 class="mb-4">7.5 The Row Identifier: PRIMARY KEY Constraint</h1>
+
+<p>The <code>PRIMARY KEY</code> constraint is arguably the most fundamental constraint in relational database design. Its purpose is to uniquely identify each individual row within a table.</p>
+
+<p>Key characteristics of a Primary Key:</p>
+<ul>
+    <li><strong>Uniqueness:</strong> Every value in the primary key column (or combination of columns) must be unique across the entire table. No two rows can have the same primary key value.</li>
+    <li><strong>Non-Nullability:</strong> Primary key columns cannot contain <code>NULL</code> values. Each row must have a valid primary key value.</li>
+    <li><strong>Single Key Per Table:</strong> A table can have only one primary key. However, this single key can consist of one or more columns (a composite primary key).</li>
+</ul>
+
+<p>Primary keys are essential for:</p>
+<ul>
+    <li>Distinguishing between rows, even if other columns have duplicate data.</li>
+    <li>Establishing relationships between tables using foreign keys. The foreign key in one table typically references the primary key in another table.</li>
+    <li>Optimizing data retrieval, as databases often create an index automatically on the primary key column(s).</li>
+</ul>
+
+<p>Syntax (Single Column):</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE products (
+    product_id INTEGER PRIMARY KEY, -- Defined inline
+    name TEXT NOT NULL,
+    price REAL
+);
+</code></pre>
+<p>In SQLite, declaring an `INTEGER` column as `PRIMARY KEY` often implicitly makes it auto-incrementing (aliased to the internal `rowid`).</p>
+
+<p>Syntax (Table Level - for Composite Keys):</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE order_items (
+    order_id INTEGER,
+    product_id INTEGER,
+    quantity INTEGER,
+    -- The combination of order_id and product_id uniquely identifies an item within an order
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id), -- Example relationships
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);
+</code></pre>
+
+<p>Attempting to insert a row with a duplicate primary key value or a <code>NULL</code> value will result in a constraint violation error.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">The `dept_id` is the PRIMARY KEY. Try inserting a department with a duplicate ID.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="12">DROP TABLE IF EXISTS departments_pk_test;
+
+CREATE TABLE departments_pk_test (
+    dept_id INTEGER PRIMARY KEY,
+    dept_name TEXT NOT NULL UNIQUE
+);
+
+-- This works
+INSERT INTO departments_pk_test (dept_id, dept_name) VALUES (10, 'Finance');
+
+-- This works
+INSERT INTO departments_pk_test (dept_id, dept_name) VALUES (20, 'Legal');
+
+-- This should FAIL (duplicate PRIMARY KEY: 10)
+INSERT INTO departments_pk_test (dept_id, dept_name) VALUES (10, 'Accounting');
+
+-- Check contents
+SELECT * FROM departments_pk_test;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

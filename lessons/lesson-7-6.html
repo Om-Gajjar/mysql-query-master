@@ -1,0 +1,103 @@
+<h1 class="mb-4">7.6 Linking Tables: FOREIGN KEY Constraint</h1>
+
+<p>The <code>FOREIGN KEY</code> constraint is the mechanism used to enforce relationships between tables, ensuring <strong>referential integrity</strong>.</p>
+<p>It establishes a link where values in a column (or set of columns) in one table (the "child" or "referencing" table) must match existing values in a specified column (usually the primary key) of another table (the "parent" or "referenced" table).</p>
+
+<p>This prevents "orphan" records – for example, it stops you from assigning a user to a `department_id` that doesn't actually exist in the `departments` table.</p>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE child_table (
+    child_id INTEGER PRIMARY KEY,
+    description TEXT,
+    parent_id INTEGER, -- This column will link to the parent table
+
+    -- Define the foreign key constraint
+    FOREIGN KEY (parent_id) REFERENCES parent_table(parent_primary_key_column)
+        ON DELETE action -- Optional: Specify action when referenced parent row is deleted
+        ON UPDATE action -- Optional: Specify action when referenced parent key is updated
+);
+
+-- parent_table structure assumption:
+-- CREATE TABLE parent_table (parent_primary_key_column INTEGER PRIMARY KEY, ...);
+</code></pre>
+
+<p>Common <code>ON DELETE</code> / <code>ON UPDATE</code> actions include:</p>
+<ul>
+    <li><code>NO ACTION</code> or <code>RESTRICT</code>: (Often the default) Prevents deleting/updating the parent row if child rows reference it.</li>
+    <li><code>CASCADE</code>: Automatically deletes/updates the child rows when the referenced parent row is deleted/updated. Use with caution!</li>
+    <li><code>SET NULL</code>: Sets the foreign key column(s) in the child rows to <code>NULL</code> when the parent row is deleted/updated (requires the foreign key column to allow NULLs).</li>
+    <li><code>SET DEFAULT</code>: Sets the foreign key column(s) to their default value (requires a default value and potentially NULL allowance).</li>
+</ul>
+
+<p>Our original `users` and `departments` tables use a foreign key:</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE,
+    department_id INTEGER, -- Foreign key column
+    -- Constraint definition
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
+    -- Default ON DELETE/UPDATE action is often NO ACTION/RESTRICT
+);
+</code></pre>
+
+<p>If you try to insert a user with a `department_id` that doesn't exist in `departments`, or if you try to delete a department that still has users assigned to it (and the action is `RESTRICT`), the database will raise a foreign key constraint violation error.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">The `fk_users` table has a FOREIGN KEY referencing `fk_departments`. Try inserting a user with an invalid `dept_id`.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="18">DROP TABLE IF EXISTS fk_users;
+DROP TABLE IF EXISTS fk_departments;
+
+CREATE TABLE fk_departments (
+    dept_id INTEGER PRIMARY KEY,
+    dept_name TEXT NOT NULL
+);
+
+CREATE TABLE fk_users (
+    user_id INTEGER PRIMARY KEY,
+    user_name TEXT NOT NULL,
+    dept_id INTEGER, -- Can be NULL
+    FOREIGN KEY (dept_id) REFERENCES fk_departments(dept_id)
+      ON DELETE SET NULL -- If department is deleted, set user's dept_id to NULL
+);
+
+-- Insert departments
+INSERT INTO fk_departments (dept_id, dept_name) VALUES (100, 'Tech');
+INSERT INTO fk_departments (dept_id, dept_name) VALUES (200, 'Admin');
+
+-- Insert valid users
+INSERT INTO fk_users (user_name, dept_id) VALUES ('Alice', 100);
+INSERT INTO fk_users (user_name, dept_id) VALUES ('Bob', 200);
+INSERT INTO fk_users (user_name, dept_id) VALUES ('Charlie', NULL); -- Allowed
+
+-- This should FAIL (FOREIGN KEY constraint violation: dept_id 300 doesn't exist)
+INSERT INTO fk_users (user_name, dept_id) VALUES ('David', 300);
+
+-- Check contents
+SELECT * FROM fk_departments;
+SELECT * FROM fk_users;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

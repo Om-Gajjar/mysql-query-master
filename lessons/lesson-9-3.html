@@ -1,0 +1,80 @@
+<h1 class="mb-4">9.3 Working with Dates and Times</h1>
+
+<p>Handling dates and times is a common requirement. SQL provides functions to get the current date/time, extract components (year, month, day), perform date arithmetic, and format dates/times.</p>
+<p>SQLite stores dates and times as TEXT, REAL, or INTEGER, but provides powerful functions to work with these representations, primarily assuming the TEXT format 'YYYY-MM-DD HH:MM:SS'.</p>
+
+<p>Key SQLite Date/Time Functions:</p>
+<ul>
+    <li><strong>Current Date/Time:</strong>
+        <ul>
+            <li><code>DATE('now')</code>: Returns the current date ('YYYY-MM-DD').</li>
+            <li><code>TIME('now')</code>: Returns the current time ('HH:MM:SS').</li>
+            <li><code>DATETIME('now')</code>: Returns the current date and time ('YYYY-MM-DD HH:MM:SS').</li>
+            <li><code>JULIANDAY('now')</code>: Returns the Julian day number (a real value).</li>
+            <li><code>STRFTIME('%s', 'now')</code>: Returns Unix timestamp (seconds since epoch).</li>
+        </ul>
+        <em>(<code>CURRENT_TIMESTAMP</code>, <code>CURRENT_DATE</code>, <code>CURRENT_TIME</code> are more standard SQL alternatives often available).</em>
+    </li>
+    <li><strong>Formatting:</strong> <code>STRFTIME(format_string, time_string, [modifiers...])</code> is very versatile.
+        <pre><code class="language-sql">SELECT STRFTIME('%Y/%m/%d', '2024-03-15'); -- Result: '2024/03/15'
+SELECT STRFTIME('%W', 'now'); -- Result: Week number of the year (00-53)
+SELECT STRFTIME('%Y', signup_date) FROM users; -- Get signup year</code></pre>
+        Common format strings: <code>%Y</code> (Year), <code>%m</code> (Month 01-12), <code>%d</code> (Day 01-31), <code>%H</code> (Hour 00-23), <code>%M</code> (Minute 00-59), <code>%S</code> (Second 00-59), <code>%w</code> (Day of week 0-6), <code>%j</code> (Day of year), <code>%W</code> (Week of year).
+    </li>
+    <li><strong>Date Modification:</strong> Functions like `DATE`, `TIME`, `DATETIME`, `JULIANDAY`, `STRFTIME` accept modifiers.
+        <pre><code class="language-sql">SELECT DATE('now', '+1 day'); -- Result: Tomorrow's date
+SELECT DATE('2024-03-15', '-1 month'); -- Result: '2024-02-15'
+SELECT DATETIME('now', 'start of year', '+6 months', '-1 day'); -- Complex calculation</code></pre>
+        Common modifiers: `+X days`, `-X months`, `+X years`, `start of month`, `start of year`, `weekday X`.
+    </li>
+    <li><strong>Calculating Differences:</strong> Use `JULIANDAY` to get numeric representations and subtract.
+        <pre><code class="language-sql">SELECT JULIANDAY('now') - JULIANDAY('2024-01-01'); -- Days since start of 2024</code></pre>
+    </li>
+</ul>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Explore date functions using the user `signup_date`.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="14">SELECT
+    name,
+    signup_date,
+    DATE(signup_date, '+1 year') AS Anniversary,
+    STRFTIME('%Y', signup_date) AS SignupYear,
+    STRFTIME('%w', signup_date) AS SignupDayOfWeek, -- 0=Sun, 6=Sat
+    JULIANDAY('now') - JULIANDAY(signup_date) AS DaysSinceSignup,
+    CASE STRFTIME('%w', signup_date)
+        WHEN '0' THEN 'Sunday'
+        WHEN '1' THEN 'Monday'
+        WHEN '2' THEN 'Tuesday'
+        WHEN '3' THEN 'Wednesday'
+        WHEN '4' THEN 'Thursday'
+        WHEN '5' THEN 'Friday'
+        ELSE 'Saturday'
+    END AS DayName
+FROM users
+ORDER BY signup_date;
+
+-- Get current time info
+-- SELECT DATE('now'), TIME('now'), DATETIME('now');
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+<h1 class="mb-4">8.1 Creating Virtual Tables: Views</h1>
+
+<p>A <strong>View</strong> in SQL is a virtual table based on the result-set of a stored SQL query. It contains rows and columns, just like a real table, but it doesn't store data itself (usually). Instead, when you query a view, the database executes the underlying query and presents the results as if they were coming from a table.</p>
+
+<p>Views are useful for several reasons:</p>
+<ul>
+    <li><strong>Simplification:</strong> Hide complex joins or calculations behind a simple view name. Users can query the view without needing to know the underlying complexity.</li>
+    <li><strong>Security:</strong> Grant users access to a view that exposes only specific columns or rows from underlying tables, restricting access to sensitive data.</li>
+    <li><strong>Consistency:</strong> Provide a consistent structure even if the underlying table schemas change (though the view definition might need updates).</li>
+    <li><strong>Reusability:</strong> Define a common data representation once and reuse it in multiple queries.</li>
+</ul>
+
+<p>Syntax to create a view:</p>
+<pre><code class="language-sql line-numbers">
+CREATE VIEW view_name AS
+SELECT column1, column2, ...
+FROM table_name(s)
+WHERE condition; -- The complete SELECT statement defining the view
+</code></pre>
+
+<p>Once created, you can query a view just like a table:</p>
+<pre><code class="language-sql line-numbers">
+SELECT * FROM view_name WHERE some_condition;
+</code></pre>
+
+<p>Example: Create a view showing only users from the 'Engineering' department along with the department name.</p>
+<pre><code class="language-sql line-numbers">
+CREATE VIEW engineering_users_view AS
+SELECT
+    u.id AS user_id,
+    u.name AS user_name,
+    u.email,
+    d.department_name
+FROM users u
+INNER JOIN departments d ON u.department_id = d.department_id
+WHERE d.department_name = 'Engineering';
+
+-- Query the view
+SELECT user_name, email FROM engineering_users_view ORDER BY user_name;
+</code></pre>
+
+<p><strong>Updating Data Through Views:</strong> Updating data directly through views is possible under certain conditions (e.g., the view references a single table, includes the primary key, doesn't use aggregation), but it can be complex and database-specific. It's often safer to update the underlying base tables directly.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Create a view showing user names and their department names, then query the view.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="14">-- Drop the view if it exists from a previous run
+DROP VIEW IF EXISTS user_department_view;
+
+-- Create the view
+CREATE VIEW user_department_view AS
+SELECT
+    u.name AS UserName,
+    d.department_name AS DepartmentName
+FROM users u
+LEFT JOIN departments d ON u.department_id = d.department_id;
+
+-- Query the newly created view
+SELECT * FROM user_department_view
+WHERE DepartmentName IS NOT NULL -- Find users with assigned departments via the view
+ORDER BY DepartmentName, UserName;
+
+-- Show all data from the view
+-- SELECT * FROM user_department_view ORDER BY UserName;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

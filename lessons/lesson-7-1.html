@@ -1,0 +1,81 @@
+<h1 class="mb-4">7.1 Common SQL Data Types</h1>
+
+<p>Choosing the correct data type for each column is crucial for data integrity, storage efficiency, and performance. SQL databases offer a variety of data types to store different kinds of information.</p>
+<p>While specific names and features can vary slightly between database systems (like MySQL, PostgreSQL, SQLite), the core concepts are similar. Here are some common categories and types frequently encountered (using common/SQLite names where applicable):</p>
+
+<h2 class="mt-5">Numeric Types</h2>
+<ul>
+    <li><code>INTEGER</code> or <code>INT</code>: Stores whole numbers (positive, negative, or zero). Often used for IDs, counts, quantities. SQLite dynamically sizes integers based on the value.</li>
+    <li><code>REAL</code> or <code>FLOAT</code> or <code>DOUBLE</code>: Stores approximate-number data values (floating-point numbers). Suitable for scientific calculations but beware of potential precision issues for exact monetary values.</li>
+    <li><code>NUMERIC</code> or <code>DECIMAL(p, s)</code>: Stores exact fixed-point numbers. Ideal for currency or financial data where precision is paramount. `p` specifies the total number of digits (precision), and `s` specifies the number of digits after the decimal point (scale). SQLite uses `NUMERIC` affinity, meaning it tries to store as INTEGER or REAL if possible, but can store text representations if needed.</li>
+</ul>
+
+<h2 class="mt-5">String (Text) Types</h2>
+<ul>
+    <li><code>TEXT</code>: Stores character strings of variable length. SQLite's `TEXT` type can store very large amounts of text.</li>
+    <li><code>VARCHAR(n)</code>: Stores variable-length character strings up to a specified maximum length `n`. While common in other systems, SQLite treats `VARCHAR(n)` similarly to `TEXT` but may store the 'n' for compatibility.</li>
+    <li><code>CHAR(n)</code>: Stores fixed-length character strings. If the string inserted is shorter than `n`, it's often padded with spaces. Less common in SQLite.</li>
+    <li><code>BLOB</code> (Binary Large Object): Stores raw binary data, like images, audio files, or serialized objects.</li>
+</ul>
+
+<h2 class="mt-5">Date and Time Types</h2>
+<p>Date and time handling varies significantly. SQLite doesn't have dedicated storage classes but stores them as:</p>
+<ul>
+    <li><code>TEXT</code>: As ISO 8601 strings (e.g., 'YYYY-MM-DD HH:MM:SS.SSS'). This is the recommended format.</li>
+    <li><code>REAL</code>: As Julian day numbers (days since noon Universal Time Nov 24, 4714 BC).</li>
+    <li><code>INTEGER</code>: As Unix Time (seconds since 1970-01-01 00:00:00 UTC).</li>
+</ul>
+<p>Built-in date/time functions (covered later) help manage these representations.</p>
+
+<h2 class="mt-5">Boolean Types</h2>
+<ul>
+    <li>Many systems have a <code>BOOLEAN</code> type (storing `TRUE` or `FALSE`).</li>
+    <li>SQLite typically represents booleans using <code>INTEGER</code> where `0` is false and `1` (or any non-zero) is true.</li>
+</ul>
+
+<p>Choosing the right data type helps prevent errors (like putting text in a number field) and allows the database to optimize storage and operations.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">This example creates a table with various data types. While SQLite is flexible, defining types is good practice.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="12">DROP TABLE IF EXISTS data_type_example;
+
+CREATE TABLE data_type_example (
+    item_id INTEGER PRIMARY KEY, -- Whole number ID
+    item_name TEXT NOT NULL,     -- Variable text
+    price NUMERIC(10, 2),        -- For currency (conceptual in SQLite)
+    quantity INTEGER DEFAULT 0,  -- Whole number count
+    weight_kg REAL,              -- Floating point weight
+    is_active INTEGER DEFAULT 1, -- Boolean (0 or 1)
+    last_updated TEXT            -- Date/Time as TEXT
+);
+
+INSERT INTO data_type_example
+ (item_name, price, quantity, weight_kg, last_updated)
+VALUES
+ ('Gadget', 19.99, 100, 0.55, DATE('now')),
+ ('Widget', 149.00, 5, 2.1, DATE('now', '-1 day'));
+
+SELECT * FROM data_type_example;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

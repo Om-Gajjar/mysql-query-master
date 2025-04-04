@@ -1,0 +1,87 @@
+<h1 class="mb-4">6.2 Combining Everything: FULL OUTER JOIN</h1>
+
+<p>What if you want *all* rows from *both* tables, matching them up where possible and showing <code>NULL</code> where matches don't exist on either side? That's the purpose of the <code>FULL OUTER JOIN</code> (or just <code>FULL JOIN</code>).</p>
+
+<p>It combines the results of both a <code>LEFT JOIN</code> and a <code>RIGHT JOIN</code>.</p>
+
+<p>Conceptual Syntax:</p>
+<pre><code class="language-sql line-numbers">
+SELECT table1.column1, table2.column2, ...
+FROM table1
+FULL OUTER JOIN table2
+ON table1.related_column = table2.related_column;
+WHERE condition; -- Optional
+</code></pre>
+
+<p>Example: List all users and all departments, showing associations where they exist.</p>
+<ul>
+    <li>Users with departments will show their department.</li>
+    <li>Users without departments will show <code>NULL</code> for department info.</li>
+    <li>Departments without users will show <code>NULL</code> for user info.</li>
+</ul>
+
+<p><strong>Important Compatibility Note:</strong> Standard SQLite (which `sql.js` uses) and older versions of MySQL do <em>not</em> directly support `FULL OUTER JOIN`. However, you can achieve the same result by combining a <code>LEFT JOIN</code> and a <code>RIGHT JOIN</code> (or two `LEFT JOIN`s) using <code>UNION ALL</code>, being careful to exclude the rows that are common to both (the `INNER JOIN` part) to avoid duplication.</p>
+
+<p>Emulation using <code>LEFT JOIN</code> and <code>UNION ALL</code>:</p>
+<pre><code class="language-sql line-numbers">
+-- Get all users and their matched departments (LEFT JOIN)
+SELECT u.name, d.department_name
+FROM users u
+LEFT JOIN departments d ON u.department_id = d.department_id
+
+UNION ALL -- Combine results (duplicates allowed for now)
+
+-- Get all departments that DON'T have a user match
+SELECT NULL, d.department_name -- Select NULL for user name
+FROM departments d
+LEFT JOIN users u ON d.department_id = u.department_id
+WHERE u.id IS NULL; -- Only include departments with no user match
+</code></pre>
+<p>This emulation gets tricky with more columns. Databases that support `FULL OUTER JOIN` make this much simpler.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Since SQLite doesn't support FULL OUTER JOIN directly, the query below emulates it using UNION ALL to show all users and all departments.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="14">-- Emulate FULL OUTER JOIN for users and departments
+
+-- Part 1: All users and their matching department (like LEFT JOIN)
+SELECT
+    u.name AS UserName,
+    d.department_name AS Department
+FROM users u
+LEFT JOIN departments d ON u.department_id = d.department_id
+
+UNION -- Use UNION to remove duplicates between the two parts
+
+-- Part 2: All departments and their matching user (like RIGHT JOIN)
+SELECT
+    u.name AS UserName,
+    d.department_name AS Department
+FROM departments d -- Tables swapped for the second part of the emulation
+LEFT JOIN users u ON d.department_id = u.department_id -- Note: u.name will be NULL if no user
+
+ORDER BY Department NULLS FIRST, UserName NULLS FIRST;
+
+-- Note: A UNION combines distinct rows from both SELECT statements.
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

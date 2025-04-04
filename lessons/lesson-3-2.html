@@ -1,0 +1,76 @@
+<h1 class="mb-4">3.2 Getting All Rows: LEFT JOIN</h1>
+
+<p>While <code>INNER JOIN</code> is great for finding matching records in both tables, sometimes you need *all* the records from one table, even if they don't have a match in the other. This is where <code>LEFT JOIN</code> comes in.</p>
+
+<p>A <code>LEFT JOIN</code> (or <code>LEFT OUTER JOIN</code> - the keyword <code>OUTER</code> is optional) returns all rows from the <strong>left table</strong> (the one listed after <code>FROM</code>) and the matched rows from the <strong>right table</strong> (the one listed after <code>LEFT JOIN</code>). If there is no match in the right table for a row from the left table, the result will contain <code>NULL</code> values for all columns selected from the right table.</p>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+SELECT table1.column1, table2.column2, ...
+FROM table1 -- Left table
+LEFT JOIN table2 -- Right table
+ON table1.related_column = table2.related_column;
+WHERE condition; -- Optional filtering on the combined result
+</code></pre>
+
+<p>Example: List *all* users and their department names. Users without a department will still be listed, but their department name will be <code>NULL</code>.</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    u.name,
+    u.email,
+    d.department_name -- This will be NULL if the user has no matching department
+FROM
+    users AS u -- users is the LEFT table
+LEFT JOIN
+    departments AS d ON u.department_id = d.department_id -- departments is the RIGHT table
+ORDER BY
+    u.name;
+</code></pre>
+<p>This is useful for finding items that *don't* have a corresponding entry in another table. For example, finding users who are *not* assigned to any department:</p>
+<pre><code class="language-sql line-numbers">
+SELECT u.name, u.email
+FROM users AS u
+LEFT JOIN departments AS d ON u.department_id = d.department_id
+WHERE d.department_id IS NULL; -- Filter for rows where the RIGHT table match failed
+</code></pre>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try the query below to list all users and their department names, including those without a department.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="10">-- List all users and their department name (if any)
+SELECT
+    u.name AS UserName,
+    d.department_name AS Department
+FROM
+    users AS u
+LEFT JOIN
+    departments AS d ON u.department_id = d.department_id
+ORDER BY
+    Department NULLS FIRST, UserName; -- Show users without department first
+
+-- Try finding departments that have NO users assigned
+-- SELECT d.department_name FROM departments d
+-- LEFT JOIN users u ON d.department_id = u.department_id
+-- WHERE u.id IS NULL;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

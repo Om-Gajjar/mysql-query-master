@@ -1,0 +1,85 @@
+<h1 class="mb-4">7.4 Enforcing Uniqueness: UNIQUE Constraint</h1>
+
+<p>The <code>UNIQUE</code> constraint ensures that all values within a column (or a combination of columns defined in a multi-column constraint) are distinct across all rows in the table. No two rows can have the same non-<code>NULL</code> value in a unique column.</p>
+
+<p>This is commonly used for columns like email addresses, usernames, product codes, or any other field that should uniquely identify a record, but isn't necessarily the primary key.</p>
+
+<p>Unlike <code>PRIMARY KEY</code>, a table can have multiple <code>UNIQUE</code> constraints. Also, <code>UNIQUE</code> constraints generally allow <code>NULL</code> values (and often allow multiple <code>NULL</code>s, as <code>NULL</code> is not considered equal to another <code>NULL</code> in standard SQL).</p>
+
+<p>Syntax (Column Level):</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE users (
+    user_id INTEGER PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    email TEXT UNIQUE, -- Allows NULL, but if present, must be unique
+    full_name TEXT NOT NULL
+);
+</code></pre>
+
+<p>Syntax (Table Level - useful for multi-column uniqueness):</p>
+<pre><code class="language-sql line-numbers">
+CREATE TABLE product_variants (
+    product_id INTEGER,
+    color TEXT,
+    size TEXT,
+    sku TEXT UNIQUE,
+    -- Ensures that the combination of product_id, color, and size is unique
+    UNIQUE (product_id, color, size)
+);
+</code></pre>
+
+<p>If you try to insert or update a row with a value that already exists in a unique column (and the existing value is not <code>NULL</code>), the database will reject the operation.</p>
+
+<p>Example violation:</p>
+<pre><code class="language-sql line-numbers">
+-- Assume a user with username 'alice' already exists in the 'users' table
+INSERT INTO users (username, full_name) VALUES ('alice', 'Alice B.'); -- This would FAIL
+</code></pre>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">This table has a `UNIQUE` constraint on the `email` column. Try inserting duplicate emails.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="15">DROP TABLE IF EXISTS subscribers;
+
+CREATE TABLE subscribers (
+    sub_id INTEGER PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL, -- Email must be provided and unique
+    signup_date TEXT
+);
+
+-- This works
+INSERT INTO subscribers (email, signup_date) VALUES ('test1@example.com', DATE('now'));
+
+-- This also works (NULL allowed if not NOT NULL, but email here IS NOT NULL)
+-- INSERT INTO subscribers (email) VALUES (NULL); -- Would fail if email is NOT NULL
+
+-- This works (different email)
+INSERT INTO subscribers (email, signup_date) VALUES ('test2@example.com', DATE('now'));
+
+-- This should FAIL (duplicate email)
+INSERT INTO subscribers (email, signup_date) VALUES ('test1@example.com', DATE('now'));
+
+-- Check contents
+SELECT * FROM subscribers;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+<h1 class="mb-4">9.1 Manipulating Text: String Functions</h1>
+
+<p>SQL provides a rich set of built-in functions to manipulate string (text) data. These allow you to combine strings, extract parts of strings, change their case, find lengths, replace characters, and more.</p>
+<p>Function names and syntax can vary slightly between database systems, but the core functionalities are common. Here are some examples using SQLite-compatible syntax:</p>
+
+<ul>
+    <li><strong>Concatenation (Joining Strings):</strong> Use the <code>||</code> operator.
+        <pre><code class="language-sql">SELECT 'Hello' || ' ' || 'World!'; -- Result: 'Hello World!'</code></pre>
+        <em>(MySQL uses `CONCAT()` function)</em>
+    </li>
+    <li><strong>Length:</strong> <code>LENGTH(string)</code> returns the number of characters.
+        <pre><code class="language-sql">SELECT LENGTH('Database'); -- Result: 8</code></pre>
+    </li>
+    <li><strong>Substring (Extracting Parts):</strong> <code>SUBSTR(string, start, length)</code> or <code>SUBSTR(string, start)</code>. Note: Indexing starts at 1.
+        <pre><code class="language-sql">SELECT SUBSTR('Programming', 5, 7); -- Result: 'grammin'
+SELECT SUBSTR('Database', 5);      -- Result: 'base'</code></pre>
+    </li>
+    <li><strong>Upper Case:</strong> <code>UPPER(string)</code> converts to uppercase.
+        <pre><code class="language-sql">SELECT UPPER('example'); -- Result: 'EXAMPLE'</code></pre>
+    </li>
+    <li><strong>Lower Case:</strong> <code>LOWER(string)</code> converts to lowercase.
+        <pre><code class="language-sql">SELECT LOWER('EXAMPLE'); -- Result: 'example'</code></pre>
+    </li>
+    <li><strong>Replace:</strong> <code>REPLACE(string, substring_to_find, replacement)</code> replaces all occurrences.
+        <pre><code class="language-sql">SELECT REPLACE('Good morning!', 'morning', 'evening'); -- Result: 'Good evening!'</code></pre>
+    </li>
+     <li><strong>Trim (Removing Spaces):</strong> <code>TRIM(string)</code> removes leading/trailing spaces. <code>LTRIM</code> removes leading, <code>RTRIM</code> removes trailing.
+        <pre><code class="language-sql">SELECT TRIM('   Extra Spaces   '); -- Result: 'Extra Spaces'</code></pre>
+    </li>
+     <li><strong>Find Position:</strong> <code>INSTR(string, substring)</code> returns the starting position (1-based) of the first occurrence of a substring. Returns 0 if not found.
+        <pre><code class="language-sql">SELECT INSTR('Database', 'base'); -- Result: 5</code></pre>
+    </li>
+</ul>
+
+<p>These functions are incredibly useful for formatting output, cleaning data, or creating derived values in your queries.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try using various string functions on the user names and emails.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="12">SELECT
+    name,
+    email,
+    UPPER(name) AS UpperName,
+    LOWER(SUBSTR(email, 1, INSTR(email, '@') -1)) AS LowerLocalPart, -- Get part before @
+    LENGTH(name) AS NameLength,
+    name || ' (' || email || ')' AS ContactInfo,
+    REPLACE(name, ' ', '_') AS NameWithUnderscore
+FROM users
+WHERE name LIKE 'A%'; -- Only users starting with A
+
+-- Try formatting the signup_date (stored as text)
+-- SELECT name, STRFTIME('%Y/%m/%d', signup_date) FROM users;
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>
