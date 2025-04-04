@@ -1,0 +1,90 @@
+<!-- filepath: d:\github\repositories clone\DBS Course\lessons\lesson-5-1.html -->
+<h1 class="mb-4">5.1 Introduction to Subqueries</h1>
+
+<p>A <strong>subquery</strong>, also known as an inner query or nested query, is a query embedded inside another SQL query. Subqueries allow you to perform more complex operations by breaking them down into smaller, logical steps.</p>
+
+<p>Subqueries can appear in several clauses, including:</p>
+<ul>
+    <li><code>SELECT</code> clause (Scalar Subquery)</li>
+    <li><code>FROM</code> clause (Derived Table)</li>
+    <li><code>WHERE</code> clause (Filtering based on query results)</li>
+    <li><code>HAVING</code> clause (Filtering groups based on query results)</li>
+</ul>
+<p>They are enclosed in parentheses <code>()</code>.</p>
+
+<h2 class="mt-5">Subqueries in the WHERE Clause</h2>
+<p>This is a very common use case. The subquery runs first, and its result is used by the outer query's <code>WHERE</code> condition.</p>
+
+<p>Example: Find all users who are in the 'Engineering' department, using a subquery to get the department ID.</p>
+<pre><code class="language-sql line-numbers">
+SELECT name, email
+FROM users
+WHERE department_id = (
+    SELECT department_id
+    FROM departments
+    WHERE department_name = 'Engineering'
+);
+-- The subquery returns a single value (the ID for Engineering),
+-- which is then used by the outer query's WHERE clause.
+</code></pre>
+
+<p>Example: Find all users who are in *any* department located in the 'departments' table (this is a bit redundant but shows the `IN` operator).</p>
+<pre><code class="language-sql line-numbers">
+SELECT name
+FROM users
+WHERE department_id IN (
+    SELECT department_id
+    FROM departments
+);
+-- The subquery returns a list of all department IDs.
+-- The outer query finds users whose department_id matches any value in that list.
+</code></pre>
+
+<h2 class="mt-5">Scalar Subqueries in SELECT</h2>
+<p>A scalar subquery returns exactly one row and one column (a single value). It can be used directly in the <code>SELECT</code> list.</p>
+<p>Example: Show each user's name and the total number of departments (less practical, but demonstrates the concept).</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    name,
+    (SELECT COUNT(*) FROM departments) AS total_departments
+FROM users;
+</code></pre>
+
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Try finding users whose department name starts with 'M'.</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="8">-- Find users in departments starting with 'M'
+SELECT name, department_id
+FROM users
+WHERE department_id IN (
+    SELECT department_id
+    FROM departments
+    WHERE department_name LIKE 'M%' -- Subquery finds IDs for Marketing
+);
+
+-- Try finding the department with the highest ID using a subquery
+-- SELECT department_name FROM departments
+-- WHERE department_id = (SELECT MAX(department_id) FROM departments);
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>
