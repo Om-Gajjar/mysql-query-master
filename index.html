@@ -283,16 +283,58 @@
                 </div>
             </nav>
 
-            <!-- Main Content Area - now takes full width -->
+            <!-- Main Content Area with modern design -->
             <main id="content-area" class="col-12 px-md-4 py-3">
-                <h2>Welcome!</h2>
-                <p>Select a lesson from the sidebar to begin learning about MySQL queries.</p>
-                <p>This website provides interactive examples and a sandbox environment to practice your skills directly
-                    in the browser.</p>
-                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
-                    alt="Database technology concept" class="img-fluid rounded mt-3"
-                    style="max-height: 400px; object-fit: cover; width: 100%;">
-
+                <!-- Hero Section -->
+                <div class="hero-section text-center py-5 mb-5 rounded">
+                    <div class="hero-content p-4">
+                        <h1 class="display-4 fw-bold mb-4 text-gradient">Master MySQL Queries</h1>
+                        <p class="lead mb-4">Your interactive journey to becoming a database expert starts here. Learn at your own pace with hands-on examples.</p>
+                        <button class="btn btn-primary btn-lg pulse-btn mb-4" onclick="document.querySelector('.sidebar .nav-link').click()">
+                            <i class="bi bi-play-fill me-2"></i>Start Learning
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Features Section -->
+                <div class="row g-4 mb-5">
+                    <div class="col-md-4">
+                        <div class="feature-card rounded h-100 p-4 text-center">
+                            <div class="feature-icon mb-3 rounded-circle bg-primary-soft">
+                                <i class="bi bi-code-square"></i>
+                            </div>
+                            <h3 class="h5">Interactive Examples</h3>
+                            <p>Practice real SQL queries directly in your browser with immediate feedback.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card rounded h-100 p-4 text-center">
+                            <div class="feature-icon mb-3 rounded-circle bg-primary-soft">
+                                <i class="bi bi-layers"></i>
+                            </div>
+                            <h3 class="h5">Progressive Learning</h3>
+                            <p>From basics to advanced concepts, build your SQL knowledge step by step.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="feature-card rounded h-100 p-4 text-center">
+                            <div class="feature-icon mb-3 rounded-circle bg-primary-soft">
+                                <i class="bi bi-lightning"></i>
+                            </div>
+                            <h3 class="h5">Real-World Skills</h3>
+                            <p>Learn practical database techniques used in professional environments.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Image Section with caption -->
+                <div class="image-container position-relative rounded overflow-hidden mb-4">
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+                        alt="Database technology concept" class="img-fluid w-100" style="max-height: 400px; object-fit: cover;">
+                    <div class="image-overlay d-flex align-items-end p-4">
+                        <p class="text-white mb-0 fw-light"><i class="bi bi-info-circle me-2"></i>Explore comprehensive SQL lessons with practical examples</p>
+                    </div>
+                </div>
             </main>
         </div>
     </div>

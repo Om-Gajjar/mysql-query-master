@@ -1,33 +1,37 @@
 /* --- Google Fonts Import --- */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Source+Sans+Pro:wght@400;600;700&family=Source+Code+Pro:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap');
 
 /* --- CSS Variables (Theme) --- */
 :root {
-    --primary-color: #0d6efd; /* Bootstrap Blue (can be changed, e.g., #00796b Teal) */
-    --primary-color-rgb: 13, 110, 253;
-    --secondary-color: #6c757d; /* Bootstrap Secondary */
-    --light-bg: #f8f9fa; /* Light Gray */
+    --primary-color: #4361ee; /* Modern blue */
+    --primary-color-rgb: 67, 97, 238;
+    --secondary-color: #6c757d;
+    --accent-color: #f72585; /* Vibrant accent for highlights */
+    --accent-color-rgb: 247, 37, 133;
+    --light-bg: #f8f9fa;
     --lighter-bg: #f0f2f5; /* Main background */
-    --dark-bg: #343a40; /* Dark Gray */
-    --text-color: #212529; /* Default Text */
+    --dark-bg: #2b2d42; /* Darker for contrast */
+    --text-color: #2b2d42;
     --text-muted: #6c757d;
     --border-color: #dee2e6;
+    
+    --success-color: #38b000;
+    --success-color-rgb: 56, 176, 0;
+    --error-color: #ef233c;
+    --error-color-rgb: 239, 35, 60;
+    --running-color: #3a86ff;
+    --running-color-rgb: 58, 134, 255;
+
     --code-bg: #2d2d2d; /* Okaidia theme background */
     --code-text: #f8f8f2; /* Okaidia theme text */
-    --success-color: #198754;
-    --success-color-rgb: 25, 135, 84;
-    --error-color: #dc3545;
-    --error-color-rgb: 220, 53, 69;
-    --running-color: #0dcaf0; /* Info Blue */
-    --running-color-rgb: 13, 202, 240;
 
-    --body-font: 'Source Sans Pro', sans-serif;
+    --body-font: 'Inter', sans-serif;
     --heading-font: 'Poppins', sans-serif;
-    --code-font: 'Source Code Pro', monospace;
+    --code-font: 'JetBrains Mono', monospace;
 
-    --border-radius: 0.375rem; /* Bootstrap's default */
-    --box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
-    --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    --border-radius: 0.5rem; /* Slightly larger radius */
+    --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15);
 }
 
 /* --- Base & Typography --- */
@@ -65,6 +69,15 @@ h3 { /* Further Sub-sections */
     font-weight: 600;
     color: var(--primary-color); /* Use primary color for H3 */
 }
+
+/* Text gradient effect for headings */
+.text-gradient {
+    background: linear-gradient(120deg, var(--primary-color), #7209b7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
 p {
     margin-bottom: 1.25rem; /* Slightly more space after paragraphs */
     max-width: 75ch; /* Limit paragraph width for readability */
@@ -127,6 +140,18 @@ a:hover {
     margin-top: 0.5rem;
 }
 
+/* --- Hero Section --- */
+.hero-section {
+    background: linear-gradient(135deg, rgba(var(--primary-color-rgb), 0.08) 0%, rgba(67, 97, 238, 0.12) 100%);
+    border: 1px solid rgba(var(--primary-color-rgb), 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.hero-section:hover {
+    box-shadow: 0 15px 35px rgba(var(--primary-color-rgb), 0.1);
+    transform: translateY(-5px);
+}
 
 /* --- Sidebar (Mobile Style for All Screens) --- */
 .sidebar {
@@ -201,11 +226,11 @@ a:hover {
     color: #343a40; /* Darker text */
     padding: 0.7rem 1rem 0.7rem 1.5rem; /* Adjust padding (more left) */
     margin: 0.1rem 0.75rem; /* Adjust margin */
-    border-radius: var(--border-radius);
+    border-radius: 8px; /* Updated from var(--border-radius) */
     display: flex;
     align-items: center;
     border-left: 4px solid transparent; /* Indicator area */
-    transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out, border-left-color 0.15s ease-in-out;
+    transition: all 0.2s ease-in-out; /* Updated for smoother transitions */
     position: relative;
     overflow: hidden; /* For potential future effects */
 }
@@ -219,10 +244,11 @@ a:hover {
 
 /* Sidebar Hover State */
 .sidebar .nav-link:hover {
-    background-color: var(--light-bg);
+    background-color: rgba(var(--primary-color-rgb), 0.08);
     color: var(--primary-color);
     border-left-color: var(--primary-color); /* Show border on hover */
     text-decoration: none;
+    transform: translateX(3px);
 }
 .sidebar .nav-link:hover i.bi {
     color: var(--primary-color);
@@ -230,10 +256,11 @@ a:hover {
 
 /* Sidebar Active State */
 .sidebar .nav-link.active {
-    background-color: rgba(var(--primary-color-rgb), 0.08); /* Subtle primary background */
+    background-color: rgba(var(--primary-color-rgb), 0.15);
     color: var(--primary-color);
-    font-weight: 700; /* Bold active link */
+    font-weight: 600; /* Changed from 700 to 600 */
     border-left-color: var(--primary-color); /* Strong border */
+    transform: translateX(5px);
 }
 .sidebar .nav-link.active i.bi {
     color: var(--primary-color);
@@ -249,7 +276,6 @@ a:hover {
 .sidebar .nav-link.disabled i.bi {
     color: #adb5bd;
 }
-
 
 /* --- Main Content Area --- */
 #content-area {
@@ -275,6 +301,54 @@ a:hover {
     box-shadow: var(--box-shadow-sm);
 }
 
+/* --- Image Styling --- */
+.image-container {
+    position: relative;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.image-container:hover {
+    transform: scale(1.01);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.image-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+
+/* --- Feature Cards --- */
+.feature-card {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(var(--primary-color-rgb), 0.15);
+    border-color: rgba(var(--primary-color-rgb), 0.3);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+}
+
+.feature-icon i {
+    font-size: 1.8rem;
+    color: var(--primary-color);
+}
 
 /* --- Code Blocks (Prism.js) --- */
 pre[class*="language-"], code[class*="language-"] {
@@ -347,7 +421,6 @@ pre[class*=language-].line-numbers>code {
 	text-align: right;
 }
 
-
 /* --- SQL Sandbox Styling --- */
 .sql-sandbox.card {
     border: 1px solid var(--border-color);
@@ -397,7 +470,8 @@ pre[class*=language-].line-numbers>code {
     border-color: var(--primary-color);
     box-shadow: 0 0 0 0.25rem rgba(var(--primary-color-rgb), 0.25); /* Use RGB version for transparency */
 }
-/* Buttons */
+
+/* --- Button Styles --- */
 .sql-sandbox .btn {
     padding: 0.5rem 1rem;
     font-weight: 600;
@@ -416,6 +490,25 @@ pre[class*=language-].line-numbers>code {
 .sql-sandbox .btn-primary:hover {
      filter: brightness(90%);
      border-color: darken(var(--primary-color), 10%);
+}
+
+/* Pulsing button effect */
+.pulse-btn {
+    position: relative;
+    box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.7);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(var(--primary-color-rgb), 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0);
+    }
 }
 
 /* Query Status */
@@ -480,6 +573,10 @@ pre[class*=language-].line-numbers>code {
     word-wrap: break-word;
 }
 
+/* --- Utility Classes --- */
+.bg-primary-soft {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+}
 
 /* --- Footer --- */
 .footer {
