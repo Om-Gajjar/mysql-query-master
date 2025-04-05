@@ -22,6 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Update active state in sidebar
         updateActiveLink(targetLink);
+        
+        // Close sidebar on navigation (for all screen sizes)
+        closeSidebar();
 
         try {
             // Show loading indicator
@@ -36,19 +39,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Inject the fetched HTML into the content area
             contentArea.innerHTML = lessonHtml;
+            
+            // Scroll to top of the page
+            window.scrollTo(0, 0);
 
             // Re-initialize Prism.js for syntax highlighting on the new content
-            Prism.highlightAll();
+            if (typeof Prism !== 'undefined') {
+                Prism.highlightAll();
+            }
 
             // Initialize the SQL Sandbox controls if its elements are present
             if (document.getElementById('sql-input') && typeof window.initSqlSandbox === 'function') {
-                window.initSqlSandbox(); // This function now just attaches listeners
-            } else {
-                console.warn("Sandbox elements not found in loaded content, skipping sandbox init.");
+                // Show sandbox loading state
+                const queryStatus = document.getElementById('query-status');
+                if (queryStatus) {
+                    queryStatus.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Initializing...';
+                    queryStatus.className = 'status-running';
+                }
+                
+                window.initSqlSandbox();
             }
 
-            // Optional: Update browser history/URL if desired
-            // history.pushState({ lesson: lessonUrl }, '', `#lesson=${lessonUrl.split('/').pop().replace('.html','')}`);
+            // Update browser history/URL
+            history.pushState(
+                { lesson: lessonUrl }, 
+                '', 
+                `#lesson=${lessonUrl.split('/').pop().replace('.html','')}`
+            );
 
         } catch (error) {
             console.error("Error loading lesson:", error);
@@ -70,8 +87,31 @@ document.addEventListener('DOMContentLoaded', () => {
             activeLink.classList.add('active');
         }
     }
+    
+    // Function to close the sidebar
+    function closeSidebar() {
+        const sidebar = document.querySelector('.sidebar');
+        const backdrop = document.querySelector('.sidebar-backdrop');
+        
+        if (sidebar && backdrop) {
+            sidebar.classList.remove('show');
+            backdrop.classList.remove('show');
+            document.body.classList.remove('sidebar-open');
+        }
+    }
 
-    // Sidebar toggle functionality for all screen sizes
+    // Handle browser back/forward navigation
+    window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.lesson) {
+            const lessonId = event.state.lesson.split('/').pop().replace('.html', '');
+            const linkToLoad = document.querySelector(`.nav-link[data-lesson-url$="${lessonId}.html"]`);
+            if (linkToLoad) {
+                linkToLoad.click();
+            }
+        }
+    });
+
+    // Sidebar toggle functionality
     const sidebarToggle = document.getElementById('sidebar-toggle');
     const sidebar = document.querySelector('.sidebar');
     const backdrop = document.querySelector('.sidebar-backdrop');
@@ -90,36 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
             backdrop.classList.remove('show');
             document.body.classList.remove('sidebar-open');
         });
-        
-        // Close sidebar when a lesson is selected (for all screen sizes)
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                sidebar.classList.remove('show');
-                backdrop.classList.remove('show');
-                document.body.classList.remove('sidebar-open');
-            });
-        });
     }
 
-    // Set initial padding for the main content area to account for the toggle button
-    if (contentArea) {
-        // Additional padding is already set in CSS
-        console.log("Content area initialized with padding for sidebar toggle");
+    // Check for URL hash on initial load
+    if (window.location.hash.startsWith('#lesson=')) {
+        const lessonId = window.location.hash.substring(8); // Get lesson ID from hash
+        const linkToLoad = document.querySelector(`.nav-link[data-lesson-url$="${lessonId}.html"]`);
+        if (linkToLoad) {
+            linkToLoad.click(); // Simulate click to load the lesson
+        }
     }
-
-    // --- Initializations ---
-    // Highlight any code blocks present on the initial page load (if any)
-    // Prism.highlightAll(); // Called implicitly by autoloader script or can be called manually
-
-    // Initialize the SQL Database (this happens via sandbox.js)
-    console.log("Main app initialized. Waiting for sandbox DB...");
-
-    // Optional: Add logic here to load a lesson based on URL hash on initial page load
-    // if (window.location.hash.startsWith('#lesson=')) {
-    //    const lessonId = window.location.hash.substring(8); // Get lesson ID from hash
-    //    const linkToLoad = document.querySelector(`.nav-link[data-lesson-url$="${lessonId}.html"]`);
-    //    if (linkToLoad) {
-    //        linkToLoad.click(); // Simulate click to load the lesson
-    //    }
-    // }
 });
