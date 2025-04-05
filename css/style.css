@@ -1,10 +1,11 @@
 /* --- Google Fonts Import --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Poppins:wght@500;600&display=swap');
 
 /* --- CSS Variables (Theme) --- */
 :root {
     --primary-color: #4361ee; /* Modern blue */
     --primary-color-rgb: 67, 97, 238;
+    --primary-color-dark: #2941d1; /* Pre-darkened version of primary color */
     --secondary-color: #6c757d;
     --accent-color: #f72585; /* Vibrant accent for highlights */
     --accent-color-rgb: 247, 37, 133;
@@ -32,6 +33,11 @@
     --border-radius: 0.5rem; /* Slightly larger radius */
     --box-shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     --box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15);
+    
+    /* Z-index system */
+    --z-sidebar: 100;
+    --z-backdrop: 90;
+    --z-toggle: 110;
 }
 
 /* --- Base & Typography --- */
@@ -113,10 +119,10 @@ a {
     transition: color 0.2s ease-in-out, background-color 0.2s ease;
 }
 a:hover {
-    color: darken(var(--primary-color), 10%);
+    color: var(--primary-color-dark);
     text-decoration: none; /* Often preferred */
-     background-color: rgba(var(--primary-color-rgb), 0.05); /* Subtle hover background */
-     border-radius: 0.2rem;
+    background-color: rgba(var(--primary-color-rgb), 0.05); /* Subtle hover background */
+    border-radius: 0.2rem;
 }
 
 /* --- Header --- */
@@ -159,7 +165,7 @@ a:hover {
     top: 0;
     bottom: 0;
     left: -320px; /* Start off-screen */
-    z-index: 1030;
+    z-index: var(--z-sidebar);
     width: min(320px, 85%); /* Either 320px or 85% of viewport, whichever is smaller */
     height: 100vh;
     background-color: #ffffff;
@@ -182,7 +188,7 @@ a:hover {
     width: 100vw;
     height: 100vh;
     background-color: rgba(0,0,0,0.5);
-    z-index: 1020;
+    z-index: var(--z-backdrop);
     display: none;
 }
 
@@ -196,7 +202,7 @@ a:hover {
     position: fixed;
     top: 10px;
     left: 10px;
-    z-index: 1040;
+    z-index: var(--z-toggle);
 }
 
 .sidebar .position-sticky {
@@ -489,7 +495,7 @@ pre[class*=language-].line-numbers>code {
 }
 .sql-sandbox .btn-primary:hover {
      filter: brightness(90%);
-     border-color: darken(var(--primary-color), 10%);
+     border-color: var(--primary-color-dark);
 }
 
 /* Pulsing button effect */
@@ -508,6 +514,13 @@ pre[class*=language-].line-numbers>code {
     }
     100% {
         box-shadow: 0 0 0 0 rgba(var(--primary-color-rgb), 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pulse-btn {
+        animation: none;
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
     }
 }
 
@@ -543,11 +556,6 @@ pre[class*=language-].line-numbers>code {
     background-color: rgba(var(--running-color-rgb), 0.1);
     font-weight: 600;
 }
-/* Add icons to status (requires JS update) */
-/* #query-status.status-success::before { content: "\F28A "; font-family: 'Bootstrap-icons'; } */ /* checkmark-circle-fill */
-/* #query-status.status-error::before { content: "\F62A "; font-family: 'Bootstrap-icons'; } */ /* x-octagon-fill */
-/* #query-status.status-running::before { content: "\F6B3 "; font-family: 'Bootstrap-icons'; } */ /* hourglass-split */
-
 
 /* Query Output */
 #query-output {
@@ -560,7 +568,7 @@ pre[class*=language-].line-numbers>code {
     font-size: 0.875em; /* Slightly smaller output font */
     color: #333;
     white-space: pre; /* Use pre for better table formatting */
-    word-wrap: normal; /* Prevent wrapping with pre */
+    overflow-wrap: normal; /* Standard property replacing word-wrap */
     overflow-x: auto; /* Allow horizontal scroll */
     transition: background-color 0.3s ease;
 }
@@ -570,7 +578,7 @@ pre[class*=language-].line-numbers>code {
     border-color: rgba(var(--error-color-rgb), 0.3);
     font-weight: 500;
     white-space: pre-wrap; /* Allow wrapping for errors */
-    word-wrap: break-word;
+    overflow-wrap: break-word; /* Standard property replacing word-wrap */
 }
 
 /* --- Utility Classes --- */
@@ -593,7 +601,6 @@ pre[class*=language-].line-numbers>code {
 }
 .footer a:hover {
     color: #fff;
-    background-color: transparent; /* No bg hover in footer */
 }
 
 /* --- Responsive Adjustments --- */
@@ -614,4 +621,22 @@ pre[class*=language-].line-numbers>code {
      h2 { font-size: 1.5rem; }
      h3 { font-size: 1.2rem; }
      p, ul, ol { max-width: none; } /* Remove text width limit */
+}
+
+/* Add medium-small device breakpoint */
+@media (max-width: 575.98px) {
+    #content-area {
+        padding: 1.25rem 1rem 1.25rem 2.25rem;
+    }
+    .site-header h1 { font-size: 2rem; }
+    .sql-sandbox .card-body { padding: 1rem; }
+}
+
+/* Add support for larger screens */
+@media (min-width: 1400px) {
+    #content-area {
+        max-width: 1320px;
+        margin-left: auto;
+        margin-right: auto;
+    }
 }
