@@ -51,8 +51,13 @@ WHERE salary IS NOT NULL
 ORDER BY salary DESC;
 
 -- Clean up the added column if needed (or just reset)
--- ALTER TABLE users DROP COLUMN salary;
+...
 </textarea>
+        </div>
+
+        <!-- For schema inconsistencies, use this format: -->
+        <div class="alert alert-info mb-3">
+          <strong>Note:</strong> This example adds a temporary `salary` column to the `users` table. This column isn't part of the standard database schema and is only added temporarily for this demonstration.
         </div>
 
         <div class="d-flex align-items-center mb-3">

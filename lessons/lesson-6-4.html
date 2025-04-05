@@ -1,36 +1,34 @@
-<h1 class="mb-4">6.3 Joining a Table to Itself: Self Joins</h1>
+<h1 class="mb-4">6.4 All Combinations: CROSS JOIN</h1>
 
-<p>Sometimes, relationships exist *within* a single table. A common example is an employee table where each employee might have a manager who is also an employee in the same table.</p>
-<p>To query such relationships (e.g., list each employee next to their manager's name), you need to join the table to itself. This is called a <strong>self join</strong>.</p>
+<p>The <code>CROSS JOIN</code> produces the <strong>Cartesian product</strong> of two tables. This means it combines every row from the first table with every row from the second table.</p>
+<p>If the first table has `N` rows and the second table has `M` rows, the <code>CROSS JOIN</code> will result in `N * M` rows.</p>
 
-<p>When performing a self join, you <strong>must use table aliases</strong> to distinguish between the two instances of the same table in the query.</p>
-
-<p>Syntax:</p>
+<p>Syntax 1 (Explicit):</p>
 <pre><code class="language-sql line-numbers">
-SELECT
-    alias1.column_name,
-    alias2.column_name, ...
-FROM
-    table_name AS alias1 -- First instance (e.g., employee)
-INNER JOIN -- Or LEFT JOIN, etc.
-    table_name AS alias2 -- Second instance (e.g., manager)
-ON
-    alias1.linking_column = alias2.primary_key_column; -- e.g., employee.manager_id = manager.id
+SELECT table1.column1, table2.column2, ...
+FROM table1
+CROSS JOIN table2;
 </code></pre>
 
-<p>Example: Assume our `users` table now has a `manager_id` column that references the `id` of another user (their manager). Let's list each user and their manager's name.</p>
+<p>Syntax 2 (Implicit - Older Syntax):</p>
 <pre><code class="language-sql line-numbers">
-SELECT
-    emp.name AS EmployeeName, -- 'emp' alias for the employee instance
-    mgr.name AS ManagerName   -- 'mgr' alias for the manager instance
-FROM
-    users AS emp -- Treat this instance as the employee
-LEFT JOIN -- Use LEFT JOIN to include employees without a manager (e.g., the CEO)
-    users AS mgr ON emp.manager_id = mgr.id -- Join employee's manager_id to manager's id
-ORDER BY
-    ManagerName NULLS FIRST, EmployeeName;
+SELECT table1.column1, table2.column2, ...
+FROM table1, table2; -- Listing tables separated by commas without a WHERE clause implies CROSS JOIN
 </code></pre>
-<p>We use `LEFT JOIN` here so that employees whose `manager_id` is `NULL` (like top-level managers) are still included in the list, showing `NULL` for their manager's name.</p>
+<p>Unlike other joins, <code>CROSS JOIN</code> typically does not have an <code>ON</code> clause because it's not matching based on related columns; it's creating all possible pairings.</p>
+
+<p><strong>Use Cases:</strong> Cross joins are less common in typical data retrieval but can be useful for generating combinations, test data, or certain types of reporting templates. For example, pairing every user with every possible department status (if 'status' was another table).</p>
+
+<p>Example: Combine every user with every department (not very practical data, but shows the concept).</p>
+<pre><code class="language-sql line-numbers">
+SELECT u.name, d.department_name
+FROM users u
+CROSS JOIN departments d
+ORDER BY u.name, d.department_name;
+</code></pre>
+<p>If you have 5 users and 4 departments, this query will return 5 * 4 = 20 rows.</p>
+
+<p><strong>Warning:</strong> Be very careful with <code>CROSS JOIN</code> on large tables, as the number of resulting rows can grow extremely large very quickly, potentially consuming significant resources.</p>
 
 <!-- Interactive SQL Sandbox Section -->
 <div class="sql-sandbox card shadow-sm mt-4 mb-5">
@@ -38,26 +36,20 @@ ORDER BY
         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
     </div>
     <div class="card-body">
-        <p class="card-text text-muted">Assuming the 'users' table has a 'manager_id', try the query below to list employees and their managers. (Requires schema update in sandbox.js).</p>
+        <p class="card-text text-muted">Try combining users and departments using CROSS JOIN. Observe the number of rows generated.</p>
 
         <div class="mb-3">
             <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
-            <textarea id="sql-input" class="form-control font-monospace" rows="12">-- List employees and their managers using a self join
+            <textarea id="sql-input" class="form-control font-monospace" rows="8">-- Show all combinations of users and departments
 SELECT
-    emp.id AS EmployeeID,
-    emp.name AS EmployeeName,
-    emp.manager_id AS ManagerID,
-    mgr.name AS ManagerName
+    'User: ' || u.name || ' / Dept: ' || d.department_name AS Combination
 FROM
-    users AS emp
-LEFT JOIN
-    users AS mgr ON emp.manager_id = mgr.id
-ORDER BY
-    emp.id;
+    users u
+CROSS JOIN
+    departments d;
 
--- If the schema wasn't updated, this query might produce limited results
--- or errors depending on the exact sandbox setup.
--- Make sure sandbox.js includes manager_id in CREATE TABLE and INSERTs.
+-- Count the total combinations
+-- SELECT COUNT(*) FROM users CROSS JOIN departments;
 </textarea>
         </div>
 

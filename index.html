@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="theme-color" content="#4361ee">
     <title>Master MySQL Queries</title>
 
     <!-- Bootstrap 5 CSS CDN -->
@@ -20,6 +21,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/common.css">
 
 </head>
 
@@ -337,6 +339,27 @@
                 </div>
             </main>
         </div>
+    </div>
+
+    <!-- Add modal for dangerous operations -->
+    <div class="modal fade" id="dangerConfirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Warning: Potentially Dangerous Operation</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>The query you're trying to execute might be destructive and affect multiple rows:</p>
+            <pre id="dangerous-query-preview" class="bg-light p-2"></pre>
+            <p>Are you sure you want to proceed?</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirm-dangerous-query">Yes, Execute Anyway</button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <footer class="footer mt-auto py-3 bg-dark text-white text-center">

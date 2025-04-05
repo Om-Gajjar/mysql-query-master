@@ -1,0 +1,75 @@
+<h1 class="mb-4">6.3 Joining a Table to Itself: Self Joins</h1>
+
+<p>Sometimes, relationships exist *within* a single table. A common example is an employee table where each employee might have a manager who is also an employee in the same table.</p>
+<p>To query such relationships (e.g., list each employee next to their manager's name), you need to join the table to itself. This is called a <strong>self join</strong>.</p>
+
+<p>When performing a self join, you <strong>must use table aliases</strong> to distinguish between the two instances of the same table in the query.</p>
+
+<p>Syntax:</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    alias1.column_name,
+    alias2.column_name, ...
+FROM
+    table_name AS alias1 -- First instance (e.g., employee)
+INNER JOIN -- Or LEFT JOIN, etc.
+    table_name AS alias2 -- Second instance (e.g., manager)
+ON
+    alias1.linking_column = alias2.primary_key_column; -- e.g., employee.manager_id = manager.id
+</code></pre>
+
+<p>Example: Assume our `users` table now has a `manager_id` column that references the `id` of another user (their manager). Let's list each user and their manager's name.</p>
+<pre><code class="language-sql line-numbers">
+SELECT
+    emp.name AS EmployeeName, -- 'emp' alias for the employee instance
+    mgr.name AS ManagerName   -- 'mgr' alias for the manager instance
+FROM
+    users AS emp -- Treat this instance as the employee
+LEFT JOIN -- Use LEFT JOIN to include employees without a manager (e.g., the CEO)
+    users AS mgr ON emp.manager_id = mgr.id -- Join employee's manager_id to manager's id
+ORDER BY
+    ManagerName NULLS FIRST, EmployeeName;
+</code></pre>
+<p>We use `LEFT JOIN` here so that employees whose `manager_id` is `NULL` (like top-level managers) are still included in the list, showing `NULL` for their manager's name.</p>
+
+<!-- Interactive SQL Sandbox Section -->
+<div class="sql-sandbox card shadow-sm mt-4 mb-5">
+    <div class="card-header bg-light py-3">
+        <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+    </div>
+    <div class="card-body">
+        <p class="card-text text-muted">Assuming the 'users' table has a 'manager_id', try the query below to list employees and their managers. (Requires schema update in sandbox.js).</p>
+
+        <div class="mb-3">
+            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+            <textarea id="sql-input" class="form-control font-monospace" rows="12">-- List employees and their managers using a self join
+SELECT
+    emp.id AS EmployeeID,
+    emp.name AS EmployeeName,
+    emp.manager_id AS ManagerID,
+    mgr.name AS ManagerName
+FROM
+    users AS emp
+LEFT JOIN
+    users AS mgr ON emp.manager_id = mgr.id
+ORDER BY
+    emp.id;
+
+-- If the schema wasn't updated, this query might produce limited results
+-- or errors depending on the exact sandbox setup.
+-- Make sure sandbox.js includes manager_id in CREATE TABLE and INSERTs.
+</textarea>
+        </div>
+
+        <div class="d-flex align-items-center mb-3">
+             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+             <div id="query-status" class="fw-bold ms-auto">Ready</div>
+        </div>
+
+        <div>
+            <label for="query-output" class="form-label fw-bold">Output:</label>
+            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+        </div>
+    </div>
+</div>

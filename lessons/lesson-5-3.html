@@ -1,4 +1,3 @@
-<!-- filepath: d:\github\repositories clone\DBS Course\lessons\lesson-5-3.html -->
 <h1 class="mb-4">5.3 Using Subqueries in INSERT Statements</h1>
 
 <p>Subqueries are frequently used with <code>INSERT</code> statements to copy data from one table to another or to insert the results of calculations or aggregations.</p>
@@ -41,6 +40,10 @@ WHERE department_id = (
 -- Verify the new table's content
 -- SELECT * FROM engineering_staff;
 </code></pre>
+
+<div class="alert alert-info mb-3">
+  <strong>Note:</strong> This example creates a new table called `engineering_staff` temporarily. This table isn't part of the standard database schema but is created by this example for demonstration purposes.
+</div>
 
 <p>Example: Insert aggregated data. Let's say we have a `department_summary` table and want to insert the count of users per department.</p>
 <pre><code class="language-sql line-numbers">

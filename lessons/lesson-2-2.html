@@ -52,6 +52,12 @@ SELECT * FROM departments;
 </textarea>
         </div>
 
+        <!-- For dangerous SQL examples, use this format: -->
+        <div class="alert alert-danger">
+          <strong>DANGER!</strong> The following query would modify ALL rows in the database if run without a WHERE clause. 
+          Never execute such queries on a production database!
+        </div>
+
         <div class="d-flex align-items-center mb-3">
             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>

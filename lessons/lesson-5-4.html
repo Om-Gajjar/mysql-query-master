@@ -1,11 +1,18 @@
-<!-- filepath: d:\github\repositories clone\DBS Course\lessons\lesson-5-4.html -->
-<h1 class="mb-4">5.4 EXISTS and Correlated Subqueries</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXISTS & Correlated Subqueries</title>
+</head>
+<body>
+    <h1 class="mb-4">5.4 EXISTS and Correlated Subqueries</h1>
 
-<p>The <code>EXISTS</code> operator is used in a <code>WHERE</code> clause to check if a subquery returns any rows. It returns `TRUE` if the subquery returns one or more rows, and `FALSE` otherwise. It's often used with *correlated subqueries*.</p>
+    <p>The <code>EXISTS</code> operator is used in a <code>WHERE</code> clause to check if a subquery returns any rows. It returns `TRUE` if the subquery returns one or more rows, and `FALSE` otherwise. It's often used with *correlated subqueries*.</p>
 
-<h2 class="mt-5">The EXISTS Operator</h2>
-<p>Syntax:</p>
-<pre><code class="language-sql line-numbers">
+    <h2 class="mt-5">The EXISTS Operator</h2>
+    <p>Syntax:</p>
+    <pre><code class="language-sql line-numbers">
 SELECT column1, ...
 FROM table1
 WHERE EXISTS (
@@ -13,18 +20,18 @@ WHERE EXISTS (
     FROM table2
     WHERE condition_linking_table1_and_table2
 );
-</code></pre>
-<ul>
-    <li>The <code>SELECT</code> list inside the <code>EXISTS</code> subquery doesn't usually matter (often <code>SELECT 1</code> or <code>SELECT *</code> is used). The database just checks if *any* row meets the subquery's <code>WHERE</code> condition.</li>
-    <li><code>NOT EXISTS</code> does the opposite: it's true only if the subquery returns zero rows.</li>
-</ul>
+    </code></pre>
+    <ul>
+        <li>The <code>SELECT</code> list inside the <code>EXISTS</code> subquery doesn't usually matter (often <code>SELECT 1</code> or <code>SELECT *</code> is used). The database just checks if *any* row meets the subquery's <code>WHERE</code> condition.</li>
+        <li><code>NOT EXISTS</code> does the opposite: it's true only if the subquery returns zero rows.</li>
+    </ul>
 
-<h2 class="mt-5">Correlated Subqueries</h2>
-<p>A correlated subquery is one that refers to columns from the outer query. The subquery is evaluated *once for each row* processed by the outer query.</p>
-<p><code>EXISTS</code> is frequently used with correlated subqueries to find rows in one table that have (or don't have) a related row in another table, without needing to return data from the second table.</p>
+    <h2 class="mt-5">Correlated Subqueries</h2>
+    <p>A correlated subquery is one that refers to columns from the outer query. The subquery is evaluated *once for each row* processed by the outer query.</p>
+    <p><code>EXISTS</code> is frequently used with correlated subqueries to find rows in one table that have (or don't have) a related row in another table, without needing to return data from the second table.</p>
 
-<p>Example: Find all departments that have at least one user assigned to them.</p>
-<pre><code class="language-sql line-numbers">
+    <p>Example: Find all departments that have at least one user assigned to them.</p>
+    <pre><code class="language-sql line-numbers">
 SELECT department_name
 FROM departments d -- Alias 'd' for the outer query table
 WHERE EXISTS (
@@ -34,10 +41,10 @@ WHERE EXISTS (
 );
 -- For each department 'd', the subquery checks if there's ANY user 'u'
 -- whose department_id matches the current department's ID.
-</code></pre>
+    </code></pre>
 
-<p>Example: Find all users who do *not* have a matching department in the `departments` table (e.g., if their `department_id` is invalid or NULL, though NULL handling can be tricky).</p>
-<pre><code class="language-sql line-numbers">
+    <p>Example: Find all users who do *not* have a matching department in the `departments` table (e.g., if their `department_id` is invalid or NULL, though NULL handling can be tricky).</p>
+    <pre><code class="language-sql line-numbers">
 SELECT name
 FROM users u
 WHERE department_id IS NOT NULL -- Check only non-null IDs
@@ -47,19 +54,19 @@ AND NOT EXISTS (
     WHERE d.department_id = u.department_id -- Correlated check
 );
 -- This finds users with a non-null department_id that doesn't exist in the departments table.
-</code></pre>
+    </code></pre>
 
-<!-- Interactive SQL Sandbox Section -->
-<div class="sql-sandbox card shadow-sm mt-4 mb-5">
-    <div class="card-header bg-light py-3">
-         <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
-    </div>
-    <div class="card-body">
-        <p class="card-text text-muted">Try finding users who belong to the 'Sales' department using EXISTS.</p>
+    <!-- Interactive SQL Sandbox Section -->
+    <div class="sql-sandbox card shadow-sm mt-4 mb-5">
+        <div class="card-header bg-light py-3">
+             <h3 class="card-title mb-0"><i class="bi bi-keyboard me-2"></i>Interactive Sandbox</h3>
+        </div>
+        <div class="card-body">
+            <p class="card-text text-muted">Try finding users who belong to the 'Sales' department using EXISTS.</p>
 
-        <div class="mb-3">
-            <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
-            <textarea id="sql-input" class="form-control font-monospace" rows="10">-- Find users who are in the 'Sales' department using EXISTS
+            <div class="mb-3">
+                <label for="sql-input" class="form-label fw-bold">SQL Query:</label>
+                <textarea id="sql-input" class="form-control font-monospace" rows="10">-- Find users who are in the 'Sales' department using EXISTS
 SELECT u.name
 FROM users u
 WHERE EXISTS (
@@ -73,18 +80,20 @@ WHERE EXISTS (
 -- SELECT d.department_name FROM departments d
 -- WHERE NOT EXISTS (SELECT 1 FROM users u WHERE u.department_id = d.department_id);
 
-</textarea>
-        </div>
+                </textarea>
+            </div>
 
-        <div class="d-flex align-items-center mb-3">
-             <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
-             <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
-             <div id="query-status" class="fw-bold ms-auto">Ready</div>
-        </div>
+            <div class="d-flex align-items-center mb-3">
+                 <button id="run-query-btn" class="btn btn-primary me-2"><i class="bi bi-play-fill me-1"></i> Run Query</button>
+                 <button id="reset-db-btn" class="btn btn-outline-secondary me-3"><i class="bi bi-arrow-clockwise me-1"></i> Reset Database</button>
+                 <div id="query-status" class="fw-bold ms-auto">Ready</div>
+            </div>
 
-        <div>
-            <label for="query-output" class="form-label fw-bold">Output:</label>
-            <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+            <div>
+                <label for="query-output" class="form-label fw-bold">Output:</label>
+                <pre id="query-output" class="border rounded p-3 bg-light font-monospace"></pre>
+            </div>
         </div>
     </div>
-</div>
+</body>
+</html>

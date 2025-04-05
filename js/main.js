@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarNav = document.getElementById('sidebar-nav');
     const contentArea = document.getElementById('content-area');
     const sidebarLinks = sidebarNav ? sidebarNav.querySelectorAll('.nav-link[data-lesson-url]') : [];
+    
+    // Add lesson cache to optimize loading
+    const lessonCache = new Map();
 
     // Function to load lesson from URL hash
     function loadLessonFromHash() {
@@ -27,6 +30,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => linkToLoad.click(), 100);
                 }
             }
+        }
+    }
+
+    // Function to efficiently highlight code blocks
+    function highlightCodeElements(container = document) {
+        try {
+            // Only target the elements that need highlighting in the current view
+            const codeElements = container.querySelectorAll('pre code:not(.highlighted)');
+            if (codeElements.length === 0) return;
+            
+            // Mark elements to avoid re-highlighting
+            codeElements.forEach(el => el.classList.add('highlighted'));
+            
+            // Use requestAnimationFrame for better performance
+            requestAnimationFrame(() => {
+                Prism.highlightAllUnder(container);
+            });
+        } catch (e) {
+            console.error("Error highlighting code with Prism:", e);
         }
     }
 
@@ -60,30 +82,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error("Content area element not found");
                     return;
                 }
-
-                // Fetch the lesson content
-                const response = await fetch(lessonUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status} for ${lessonUrl}`);
+                
+                // Check if we have this lesson cached
+                if (lessonCache.has(lessonUrl)) {
+                    contentArea.innerHTML = lessonCache.get(lessonUrl);
+                } else {
+                    // Fetch the lesson content
+                    const response = await fetch(lessonUrl);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status} for ${lessonUrl}`);
+                    }
+                    
+                    const lessonHtml = await response.text();
+                    
+                    // Store in cache
+                    lessonCache.set(lessonUrl, lessonHtml);
+                    
+                    // Inject the fetched HTML into the content area
+                    contentArea.innerHTML = lessonHtml;
                 }
-                const lessonHtml = await response.text();
-
-                // Inject the fetched HTML into the content area
-                contentArea.innerHTML = lessonHtml;
                 
                 // Scroll to top of the page
                 window.scrollTo(0, 0);
 
                 // Re-initialize Prism.js for syntax highlighting on the new content
                 if (typeof Prism !== 'undefined') {
-                    // Defer to ensure the DOM has been fully updated
-                    setTimeout(() => {
-                        try {
-                            Prism.highlightAll();
-                        } catch (e) {
-                            console.error("Error highlighting code with Prism:", e);
-                        }
-                    }, 0);
+                    highlightCodeElements(contentArea);
                 }
 
                 // Initialize the SQL Sandbox controls if its elements are present

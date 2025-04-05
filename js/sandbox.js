@@ -10,7 +10,7 @@ function log(message) {
 
 // Using let for better block scoping
 let SQL; // Will hold the SQL object returned by initSqlJs
-let db;  // Will hold the database instance
+let dbInstance = null; // Renamed from db for clarity and better memory management
 
 // Configuration for sql.js
 const config = {
@@ -56,6 +56,30 @@ const initialDataSQL = `
 
 // --- Core Functions ---
 
+// Function to check if SQL query is safe to run
+function isSqlSafe(sql) {
+    // Regular expression to catch DROP operations even with comments or spacing
+    const dangerousPatterns = [
+        /\s*DROP\s+(?:\/\*.*?\*\/)?\s*(?:DATABASE|SCHEMA|TABLE)/i,
+        /\s*ALTER\s+(?:\/\*.*?\*\/)?\s*(?:DATABASE|SCHEMA)/i,
+        /\s*TRUNCATE\s+(?:\/\*.*?\*\/)?\s*(?:DATABASE|SCHEMA|TABLE)/i
+    ];
+    
+    return !dangerousPatterns.some(pattern => pattern.test(sql));
+}
+
+// Cleanup function for database instance
+function cleanupDatabase() {
+    if (dbInstance) {
+        try {
+            dbInstance.close();
+        } catch (e) {
+            console.error("Error closing database:", e);
+        }
+        dbInstance = null;
+    }
+}
+
 // Initializes sql.js and creates/resets the database instance
 async function initializeOrResetDatabase() {
     const statusDiv = document.getElementById('db-status'); // Optional status indicator
@@ -64,12 +88,8 @@ async function initializeOrResetDatabase() {
     }
 
     try {
-        // Close existing DB if it exists (needed for reset)
-        if (db) {
-            log("Closing existing database instance...");
-            db.close();
-            db = null; // Clear the reference
-        }
+        // Clean up existing DB if it exists (needed for reset)
+        cleanupDatabase();
 
         // Initialize SQL.js if it hasn't been already
         if (!SQL) {
@@ -83,16 +103,16 @@ async function initializeOrResetDatabase() {
 
         // Create a new database instance
         log("Creating new in-memory database instance...");
-        db = new SQL.Database();
+        dbInstance = new SQL.Database();
         log("Database instance created.");
 
         // Run schema and data setup
         log("Applying initial schema...");
-        db.run(initialSchemaSQL);
+        dbInstance.run(initialSchemaSQL);
         log("Schema applied.");
 
         log("Inserting initial data...");
-        db.run(initialDataSQL);
+        dbInstance.run(initialDataSQL);
         log("Initial data inserted.");
 
         log("Database setup complete.");
@@ -106,6 +126,7 @@ async function initializeOrResetDatabase() {
         if (statusDiv) {
             statusDiv.textContent = "Database initialization failed!";
         }
+        
         // Display a more prominent error to the user if the sandbox UI is present
         const queryStatus = document.getElementById('query-status');
         const queryOutput = document.getElementById('query-output');
@@ -117,15 +138,49 @@ async function initializeOrResetDatabase() {
             queryOutput.textContent = `Could not initialize the database engine: ${err.message}\nCheck browser console for details.`;
             queryOutput.className = 'error';
         }
-        db = null; // Ensure db is null on failure
+        
+        dbInstance = null; // Ensure db is null on failure
         return false; // Indicate failure
+    }
+}
+
+// Centralized error handling function
+function handleError(error, element, isQuery = false) {
+    console.error("SQL Error:", error);
+    
+    // Determine error type and provide helpful messages
+    let errorMessage = error.message || "An unknown error occurred";
+    let errorClass = "alert-danger";
+    
+    if (errorMessage.includes("syntax error")) {
+        errorMessage = "SQL Syntax Error: " + errorMessage;
+    } else if (errorMessage.includes("no such table")) {
+        errorMessage = "Table Not Found: " + errorMessage;
+    } else if (isQuery && errorMessage.includes("constraint failed")) {
+        errorMessage = "Constraint Violation: " + errorMessage;
+        errorClass = "alert-warning";
+    }
+    
+    // Update UI
+    element.innerHTML = `
+        <div class="alert ${errorClass}">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            ${errorMessage}
+        </div>
+    `;
+    
+    // Update status indicator if it exists
+    const statusElement = document.getElementById('query-status');
+    if (statusElement) {
+        statusElement.innerHTML = '<i class="bi bi-x-circle me-1"></i> Error';
+        statusElement.className = 'fw-bold text-danger ms-auto';
     }
 }
 
 // Function to set up event listeners for the sandbox controls ONCE the elements exist
 function setupSandboxControls() {
     const runQueryBtn = document.getElementById('run-query-btn');
-    const resetDbBtn = document.getElementById('reset-db-btn'); // New button
+    const resetDbBtn = document.getElementById('reset-db-btn');
     const sqlInput = document.getElementById('sql-input');
     const queryStatus = document.getElementById('query-status');
     const queryOutput = document.getElementById('query-output');
@@ -138,8 +193,8 @@ function setupSandboxControls() {
     log("Attaching sandbox control listeners...");
 
     // --- Run Query Button ---
-    runQueryBtn.onclick = () => { // Using onclick for simplicity
-        if (!db) {
+    runQueryBtn.onclick = () => {
+        if (!dbInstance) {
             queryStatus.innerHTML = '<i class="bi bi-x-octagon-fill me-1"></i> Error: Database not ready!';
             queryStatus.className = 'status-error';
             queryOutput.textContent = "The database engine is not initialized. Try resetting or reloading.";
@@ -160,31 +215,26 @@ function setupSandboxControls() {
             return;
         }
 
-        // Removed setTimeout for direct execution
         try {
             // WARNING: In a production app, you should use parameterized queries instead
             // This is a learning tool where direct SQL execution is intentional
             
-            // Basic check to prevent completely destructive queries (optional)
-            if (sqlString.toLowerCase().includes('drop database') || 
-                sqlString.toLowerCase().includes('drop schema')) {
-                throw new Error("Database/schema drop operations are not allowed in this sandbox");
+            // Check for dangerous SQL operations
+            if (!isSqlSafe(sqlString)) {
+                throw new Error("This query contains potentially harmful operations that are not allowed in the sandbox");
             }
             
             // Execute the SQL query
-            // db.exec() returns an array of result objects
-            const results = db.exec(sqlString);
+            const results = dbInstance.exec(sqlString);
 
             // Format and display the results
             queryOutput.textContent = formatResults(results);
             queryStatus.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Success!';
             queryStatus.className = 'status-success';
         } catch (error) {
-            console.error("SQL Execution Error:", error);
+            handleError(error, queryOutput, true);
             queryStatus.innerHTML = '<i class="bi bi-x-octagon-fill me-1"></i> Error!';
             queryStatus.className = 'status-error';
-            queryOutput.textContent = `Error: ${error.message}`;
-            queryOutput.className = 'error';
         }
     };
 
@@ -224,10 +274,8 @@ function setupSandboxControls() {
 // Function to format the results from db.exec() into a readable table string
 function formatResults(results) {
     if (!results || results.length === 0) {
-        // This might happen for queries like INSERT, UPDATE, DELETE without returning clauses
-        // Or if a SELECT query genuinely returns no rows
         try {
-            const rowsModified = db.getRowsModified();
+            const rowsModified = dbInstance.getRowsModified();
             return `Query executed successfully. Rows affected: ${rowsModified}`;
         } catch (e) {
             return "Query executed successfully. No rows returned or modified.";
@@ -275,7 +323,6 @@ function formatResults(results) {
     return output;
 }
 
-
 // --- Global Initialization ---
 // Expose the function to set up controls so main.js can call it after loading content
 window.initSqlSandbox = setupSandboxControls;
@@ -286,13 +333,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeOrResetDatabase(); // Initial database creation
 });
 
-// Add database cleanup on page unload
-window.addEventListener('beforeunload', () => {
-    if (db) {
-        log("Closing database on page unload");
-        db.close();
-    }
-});
+// Add database cleanup on page unload and pagehide (for mobile browsers)
+window.addEventListener('beforeunload', cleanupDatabase);
+window.addEventListener('pagehide', cleanupDatabase);
 
 if (DEBUG) {
     console.log("Sandbox script loaded. Waiting for DOMContentLoaded to initialize DB.");
