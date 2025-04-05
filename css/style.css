@@ -3,6 +3,7 @@
 
 /* --- CSS Variables (Theme) --- */
 :root {
+    /* Primary colors */
     --primary-color: #4361ee; /* Modern blue */
     --primary-color-rgb: 67, 97, 238;
     --primary-color-dark: #2941d1; /* Pre-darkened version of primary color */
@@ -13,7 +14,7 @@
     --lighter-bg: #f0f2f5; /* Main background */
     --dark-bg: #2b2d42; /* Darker for contrast */
     --text-color: #2b2d42;
-    --text-muted: #6c757d;
+    --text-muted: #5a6268; /* Darker than original #6c757d for better contrast */
     --border-color: #dee2e6;
     
     --success-color: #38b000;
@@ -38,6 +39,10 @@
     --z-sidebar: 100;
     --z-backdrop: 90;
     --z-toggle: 110;
+    
+    /* Fallbacks */
+    color: #2b2d42; /* Fallback for --text-color */
+    font-family: 'Inter', sans-serif; /* Fallback for --body-font */
 }
 
 /* --- Base & Typography --- */
@@ -80,8 +85,9 @@ h3 { /* Further Sub-sections */
 .text-gradient {
     background: linear-gradient(120deg, var(--primary-color), #7209b7);
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback for browsers without -webkit-text-fill-color */
 }
 
 p {
@@ -164,20 +170,21 @@ a:hover {
     position: fixed;
     top: 0;
     bottom: 0;
-    left: -320px; /* Start off-screen */
+    left: 0; /* Keep position fixed */
     z-index: var(--z-sidebar);
     width: min(320px, 85%); /* Either 320px or 85% of viewport, whichever is smaller */
     height: 100vh;
     background-color: #ffffff;
     border-right: 1px solid var(--border-color);
     box-shadow: 2px 0 5px rgba(0,0,0,0.05);
-    transition: left 0.3s ease;
+    transform: translateX(-100%); /* Use transform instead of left positioning */
+    transition: transform 0.3s ease; /* Change transition property */
     overflow-y: auto;
 }
 
 /* When sidebar is shown */
 .sidebar.show {
-    left: 0;
+    transform: translateX(0); /* Transform to visible position */
 }
 
 /* Backdrop for all screen sizes */
@@ -200,9 +207,15 @@ a:hover {
 #sidebar-toggle {
     display: block !important; /* Override Bootstrap's d-md-none */
     position: fixed;
-    top: 10px;
-    left: 10px;
+    top: max(10px, env(safe-area-inset-top, 10px));
+    left: max(10px, env(safe-area-inset-left, 10px));
     z-index: var(--z-toggle);
+    width: 44px; /* Minimum touch target size */
+    height: 44px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar .position-sticky {
@@ -369,12 +382,10 @@ pre[class*="language-"] {
     color: var(--code-text);
     border-radius: var(--border-radius);
     border: 1px solid #444;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtle shadow */
-    /* padding: 1.5em;
-    margin-top: 2rem; More space above code */
-    margin-bottom: 2rem; /* More space below code */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 2rem;
     overflow: auto;
-    max-width: 100%; /* Ensure it doesn't overflow container */
+    max-width: 100%;
 }
 
 /* Inline code */
@@ -524,6 +535,18 @@ pre[class*=language-].line-numbers>code {
     }
 }
 
+/* Common status properties */
+.status-base {
+    font-weight: 600;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease-in-out;
+    min-width: 90px;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+}
+
 /* Query Status */
 #query-status {
     font-size: 0.90em; /* Slightly smaller */
@@ -565,7 +588,8 @@ pre[class*=language-].line-numbers>code {
     border-radius: var(--border-radius);
     padding: 1rem 1.25rem; /* Adjust padding */
     font-family: var(--code-font);
-    font-size: 0.875em; /* Slightly smaller output font */
+    font-size: 0.95em; /* Increased from 0.875em */
+    line-height: 1.6; /* Added line height for readability */
     color: #333;
     white-space: pre; /* Use pre for better table formatting */
     overflow-wrap: normal; /* Standard property replacing word-wrap */
@@ -638,5 +662,30 @@ pre[class*=language-].line-numbers>code {
         max-width: 1320px;
         margin-left: auto;
         margin-right: auto;
+    }
+}
+
+/* Add prefers-reduced-motion media query for all animations */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    
+    .sidebar {
+        transition: none; /* Disable sidebar transition */
+    }
+    
+    .feature-card:hover,
+    .hero-section:hover,
+    .image-container:hover {
+        transform: none; /* Disable hover transform */
+    }
+    
+    .pulse-btn {
+        animation: none;
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.3);
     }
 }
