@@ -14,8 +14,8 @@ let db;  // Will hold the database instance
 
 // Configuration for sql.js
 const config = {
-    // Required to load the wasm binary asynchronously. Of course, you can host it wherever you want
-    // You can omit locateFile completely when running in node.js
+    // CDN dependency - if this URL becomes unavailable, the app will break
+    // Consider hosting these files locally for more reliable operation
     locateFile: filename => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${filename}`
 };
 
@@ -74,6 +74,9 @@ async function initializeOrResetDatabase() {
         // Initialize SQL.js if it hasn't been already
         if (!SQL) {
             log("Initializing SQL.js library...");
+            if (typeof initSqlJs !== 'function') {
+                throw new Error("SQL.js library (initSqlJs) not found. Make sure it's properly loaded.");
+            }
             SQL = await initSqlJs(config);
             log("SQL.js library initialized.");
         }
@@ -150,7 +153,6 @@ function setupSandboxControls() {
         queryOutput.textContent = "";
         queryOutput.className = ''; // Reset class (remove 'error' if present)
 
-
         if (!sqlString) {
             queryStatus.innerHTML = '<i class="bi bi-circle me-1"></i> Ready';
             queryStatus.className = '';
@@ -160,6 +162,15 @@ function setupSandboxControls() {
 
         // Removed setTimeout for direct execution
         try {
+            // WARNING: In a production app, you should use parameterized queries instead
+            // This is a learning tool where direct SQL execution is intentional
+            
+            // Basic check to prevent completely destructive queries (optional)
+            if (sqlString.toLowerCase().includes('drop database') || 
+                sqlString.toLowerCase().includes('drop schema')) {
+                throw new Error("Database/schema drop operations are not allowed in this sandbox");
+            }
+            
             // Execute the SQL query
             // db.exec() returns an array of result objects
             const results = db.exec(sqlString);
@@ -223,6 +234,8 @@ function formatResults(results) {
         }
     }
 
+    const MAX_CELL_DISPLAY_LENGTH = 100; // Reasonable limit to prevent display issues
+    
     let output = "";
     results.forEach((result, index) => {
         if (index > 0) output += "\n---\n"; // Separator
@@ -234,7 +247,8 @@ function formatResults(results) {
         // Calculate max width for each column based on data
         result.values.forEach(row => {
             row.forEach((val, i) => {
-                const len = (val === null ? 4 : String(val).length);
+                const displayVal = val === null ? 'NULL' : String(val);
+                const len = Math.min(displayVal.length, MAX_CELL_DISPLAY_LENGTH);
                 if (len > colWidths[i]) {
                     colWidths[i] = len;
                 }
@@ -248,7 +262,13 @@ function formatResults(results) {
 
         // Format data rows
         result.values.forEach(row => {
-            output += row.map((val, i) => String(val === null ? 'NULL' : val).padEnd(colWidths[i])).join(" | ") + "\n";
+            output += row.map((val, i) => {
+                const displayVal = val === null ? 'NULL' : String(val);
+                const truncatedVal = displayVal.length > MAX_CELL_DISPLAY_LENGTH ? 
+                    displayVal.substring(0, MAX_CELL_DISPLAY_LENGTH) + '...' : 
+                    displayVal;
+                return truncatedVal.padEnd(colWidths[i]);
+            }).join(" | ") + "\n";
         });
     });
 
@@ -264,6 +284,14 @@ window.initSqlSandbox = setupSandboxControls;
 // Subsequent resets will call initializeOrResetDatabase again via the button.
 document.addEventListener('DOMContentLoaded', () => {
     initializeOrResetDatabase(); // Initial database creation
+});
+
+// Add database cleanup on page unload
+window.addEventListener('beforeunload', () => {
+    if (db) {
+        log("Closing database on page unload");
+        db.close();
+    }
 });
 
 if (DEBUG) {
